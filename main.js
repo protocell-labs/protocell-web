@@ -16,11 +16,23 @@ let terminal_p1, text_p1_input, text_p1, text_p1_idx;
 let button_obscvrvm, button_tectonica;
 
 let typing_speed = 2.0; // speed of typing for the text
-let font_size_text = '1.0vmin'; // used for text
-let font_size_buttons = '1.5vmin'; // used for buttons
+let font_size_text = '1.5vmin'; // used for text
+let font_size_buttons = '2.0vmin'; // used for buttons
 
 let lorem_impsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nunc id felis sollicitudin porttitor.";
 
+// [button_id, title]
+let project_buttons = [
+    ['button_monocell', 'Monocell'],
+    ['button_chromoplasm', 'Chromoplasm'],
+    ['button_crystalyx', 'Crystalyx'],
+    ['button_obscvrvm', 'O B S C V R V M'],
+    ['button_rtrdgtzr', 'rtrdgtzr'],
+    ['button_tectonica', 'T E C T O N I C A']
+];
+
+
+// this will be the text displayed after the corresponding button is clicked - button_id : text
 let button_to_text = {
     'button_monocell': "As the first iteration of protocells, monocells are primitive, digital, artificial life forms based on lattice structures. Guided by artificial selection, they evolved rigid, springy, naked skeletons with no membranes or differentiation in material and resemble organic Radiolarians living in Earth’s oceans. Monocells tend to cycle through different configurations in their evolutionary path, some stable, some in perpetual motion. Undiscovered earlier versions of protocells probably had no way of interacting with the graphics pipeline and, if at all, existed as simple graph data structures. Monocells were the first protocells which evolved monochrome display through ordered dithering.",
     'button_chromoplasm': "Second protocell collection features chromoplasms, semi-fluidic, artificial living substance connecting pigmented organelles into a membrane-like cell. They resemble unicellular prokaryotic microorganisms found on Earth. Structure and dynamics of each chromoplasm is guided by behavioral features like reconfiguration (affecting topology), modulation (affecting geometry) and degeneration (affecting both). Organelles or nodes evolved dithered 3-bit color, rendered in hundreds of color palettes and featuring luminescence. Chromoplasm creatures are found both in dark as well as light-abundant environments. They are rendered in real-time in your browser and can be interacted with.",
@@ -30,10 +42,24 @@ let button_to_text = {
     'button_tectonica': "“In the boundless loneliness of space, strangeness abounds.”<br>T E C T O N I C A logs<br><br>Standing here are the digital engrams of a spacefaring civilization, the final remnants of the Universe's vast computer, a layered stratum of glitched, galaxy-sized digital memory banks. These calcified data deposits have accumulated over eons, forming physical tectons that span light-years of space. They offer a glimpse into the fundamental building blocks employed by a forgotten alien civilization which encoded its entire culture as digital data in physical form. While the specifications for this stellar machine have been lost to time, its fractured components continue to perform computations, seemingly trapped in an eternal loop. We can observe the inner workings of this enigmatic structure, but its true meaning remains forever silent, its message encrypted."
 }
 
+// each button can spawn other buttons (like a menu) - button_id : [[button_id_a, title_a], [button_id_b, title_b]...]
+let button_spawn = {
+    'button_monocell': [['button_monocell_source', 'source'], ['button_monocell_gen', 'generator'], ['button_monocell_fxhash', 'fxhash'], ['button_monocell_fxfam', 'fxfam']],
+    'button_chromoplasm': [['button_chromoplasm_source', 'source'], ['button_chromoplasm_gen', 'generator'], ['button_chromoplasm_fxhash', 'fxhash'], ['button_chromoplasm_fxfam', 'fxfam']],
+    'button_crystalyx': [['button_crystalyx_source', 'source'], ['button_crystalyx_gen', 'generator'], ['button_crystalyx_fxhash', 'fxhash'], ['button_crystalyx_fxfam', 'fxfam']],
+    'button_obscvrvm': [['button_obscvrvm_source', 'source'], ['button_obscvrvm_gen', 'generator'], ['button_obscvrvm_fxhash', 'fxhash'], ['button_obscvrvm_fxfam', 'fxfam']],
+    'button_rtrdgtzr': [['button_rtrdgtzr_source', 'source'], ['button_rtrdgtzr_gen', 'generator'], ['button_rtrdgtzr_fxhash', 'fxhash'], ['button_rtrdgtzr_fxfam', 'fxfam']],
+    'button_tectonica': [['button_tectonica_source', 'source'], ['button_tectonica_gen', 'generator'], ['button_tectonica_fxhash', 'fxhash'], ['button_tectonica_fxfam', 'fxfam']]
+}
+
+
 let selected_button = ''; // save the id of the clicked button
+let selected_sub_button = ''; // save the id of the clicked sub-button
 let buttons = []; // array to store all buttons
-let button_arrange_vec; // this vector will help us arrange buttons in a free-form line
+let sub_buttons = []; // array to store all sub-buttons
+let button_arrange_vec, sub_button_arrange_vec, sub_button_arrange_vec_copy; // these vector will help us arrange buttons in a free-form line
 let button_offset = 40.0; // approximate value the buttons will be offset from each other
+let sub_button_offset = 200.0; // horizontal shift of sub-buttons
 
 let wireframes = []; // array to store all wireframes
 let wireframe_temp = 1.0; // speed of movement of vertices
@@ -51,9 +77,8 @@ function setup() {
     terminal_p1 = createP(lorem_impsum);
     terminal_p1.id('terminal_p1');
 
-    //terminal_p1.position(windowWidth / 2, windowHeight / 2);
     terminal_p1.style('color', secondary_color);
-    terminal_p1.style('font-family', 'monospace');
+    terminal_p1.style('font-family', 'MonoMEK'); // 'monospace'
     terminal_p1.style('font-size', font_size_text);
 
     terminal_p1.position(windowWidth / 2, windowHeight / 2);
@@ -69,36 +94,22 @@ function setup() {
     text_p1_idx = 0;
     text_p1_input = lorem_impsum;
 
-    // PROJECTS BUTTONS
 
-    // create all buttons
-    button_monocell = createButton('Monocell');
-    button_chromoplasm = createButton('Chromoplasm');
-    button_crystalyx = createButton('Crystalyx');
-    button_obscvrvm = createButton('O B S C V R V M');
-    button_rtrdgtzr = createButton('rtrdgtzr');
-    button_tectonica = createButton('T E C T O N I C A');
+    // PROJECT BUTTONS
 
-    button_arrange_vec = createVector(windowWidth / 16, random(windowWidth / 4, 3 * windowWidth / 4)); // position of the first button in the free-form line
+    // position of the first button in the free-form line
+    button_arrange_vec = createVector(windowWidth / 16, random(windowHeight / 4, 3 * windowHeight / 4)); 
+    sub_button_arrange_vec = button_arrange_vec.copy().add( createVector(sub_button_offset, button_offset / 2, 0) ); // copied vector but shifted to the right and down
 
-    // apply style to all buttons
-    applyButtonStyle(button_monocell, 'button_monocell');
-    applyButtonStyle(button_chromoplasm, 'button_chromoplasm');
-    applyButtonStyle(button_crystalyx, 'button_crystalyx');
-    applyButtonStyle(button_obscvrvm, 'button_obscvrvm');
-    applyButtonStyle(button_rtrdgtzr, 'button_rtrdgtzr');
-    applyButtonStyle(button_tectonica, 'button_tectonica');
-
-    // save all buttons
-    buttons.push(button_monocell);
-    buttons.push(button_chromoplasm);
-    buttons.push(button_crystalyx);
-    buttons.push(button_obscvrvm);
-    buttons.push(button_rtrdgtzr);
-    buttons.push(button_tectonica);
+    // spawn main project buttons
+    project_buttons.forEach(function (item, index) {
+        button = createButton(item[1]); // create button, item[1] is title
+        applyButtonStyle(button, item[0]); // apply style, item[0] is button_id
+        buttons.push(button); // store button in array
+    });
 
 
-    // WIREFRAME
+    // WIREFRAMES
 
     let wireframe_bound_x = windowWidth / 4; // buffer distance left-right where no wireframe point will be initially placed
     let wireframe_bound_y = windowHeight / 4; // buffer distance top-bottom where no wireframe point will be initially placed
@@ -174,8 +185,7 @@ function buttonOver() {
 
 // triggers when the mouse moves off the button
 function buttonOut() {
-    if (this.elt.id != selected_button) { this.style('color', secondary_color); } // if the button was not clicked, change the color back to original
-
+    if ((this.elt.id != selected_button) && (this.elt.id != selected_sub_button)) { this.style('color', secondary_color); } // if the button or sub-button was not clicked, change the color back to original
 }
 
 // triggers when the mouse is pressed and released over the button
@@ -191,6 +201,42 @@ function buttonClicked() {
 
     // save the id of the clicked button
     selected_button = this.elt.id;
+
+    // remove previous sub-buttons
+    if (sub_buttons.length != 0) {
+        sub_buttons.forEach(function (item, index) { item.remove(); });
+        sub_buttons = [];
+    } 
+
+
+    // get the vertical sequence number of the button
+    let sequence_nr = 0;
+    let clicked_button_id = this.elt.id; // we have to copy this value because this.elt.id cannot be accessed inside forEach loop
+    buttons.forEach(function (item, index) { if (item.elt.id == clicked_button_id) { sequence_nr = index}; });
+
+    // reset position vector but add some randomness
+    sub_button_arrange_vec_copy = sub_button_arrange_vec.copy().add( createVector(random(-button_offset, button_offset), sequence_nr * button_offset, 0) );
+
+    // spawn sub-buttons
+    button_spawn[selected_button].forEach(function (item, index) {
+        button = createButton(item[1]); // create button, item[1] is title
+        applySubButtonStyle(button, item[0]); // apply style, item[0] is button_id
+        sub_buttons.push(button); // store button in array
+    });
+
+}
+
+
+// triggers when the mouse is pressed and released over the sub-button
+function subButtonClicked() {
+    // change color of all sub-buttons back to the original
+    sub_buttons.forEach(function (item, index) { item.style('color', secondary_color); });
+
+    // change color of the clicked button to selected
+    this.style('color', tertiary_color);
+
+    // save the id of the clicked sub-button
+    selected_sub_button = this.elt.id;
 }
 
 
@@ -199,19 +245,39 @@ function applyButtonStyle(button, button_id) {
     button.id(button_id);
 
     button.style('color', secondary_color);
-    button.style('font-family', 'monospace');
+    button.style('font-family', 'MonoMEK'); // 'monospace'
     button.style('font-size', font_size_buttons);
 
     button.style('background-color', primary_color);
     button.style('border', 'none');
 
-    //button.position(random(windowWidth / 4, 3 * windowWidth / 4), random(windowWidth / 4, 3 * windowWidth / 4));
-    
     button.position(button_arrange_vec.x, button_arrange_vec.y); // position based on this vector
     button_arrange_vec.add(createVector(random(-button_offset, button_offset), button_offset)); // move position vector with some randomness
 
     button.mouseOver(buttonOver);
     button.mouseOut(buttonOut);
     button.mouseClicked(buttonClicked);
+
+}
+
+
+
+// applies styling to a sub-button
+function applySubButtonStyle(button, button_id) {
+    button.id(button_id);
+
+    button.style('color', secondary_color);
+    button.style('font-family', 'MonoMEK'); // 'monospace'
+    button.style('font-size', font_size_buttons);
+
+    button.style('background-color', primary_color);
+    button.style('border', 'none');
+
+    button.position(sub_button_arrange_vec_copy.x, sub_button_arrange_vec_copy.y); // position based on this vector
+    sub_button_arrange_vec_copy.add(createVector(random(-button_offset, button_offset), button_offset)); // move position vector with some randomness
+
+    button.mouseOver(buttonOver);
+    button.mouseOut(buttonOut);
+    button.mouseClicked(subButtonClicked);
 
 }

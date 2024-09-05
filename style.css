@@ -8,3 +8,8 @@ body {
 canvas {
     display: block;
 }
+
+@font-face {
+    font-family: 'MonoMEK';
+    src: url('MEK-Mono.otf');
+}
