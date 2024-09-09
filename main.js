@@ -8,18 +8,24 @@
 
 
 
+let ascii_image = formatASCII(luka_ascii_raw);
+
+
+
 let primary_color = '#000000'; // black
 let secondary_color = '#00ff00'; // green
 let tertiary_color = '#ff00ff'; // magenta
 
-let terminal_p1, text_p1_input, text_p1, text_p1_idx;
-let button_obscvrvm, button_tectonica;
+let terminal_p1, text_p1_input, text_p1, text_p1_idx; // text terminal
+let terminal_i1, text_i1_input, text_ip1, text_i1_idx; // image terminal
 
-let typing_speed = 5.0; // speed of typing for the text
-let font_size_text = '1.5vmin'; // used for text
+let typing_speed = 50.0; // speed of typing for the text
+let font_size_text = '1.5vmin'; // used for text, '1.5vmin'
+let font_size_image = '0.75vmin'; // used for images
 let font_size_buttons = '2.0vmin'; // used for buttons
 
-let lorem_impsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nunc id felis sollicitudin porttitor. ";
+let lorem_impsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nunc id felis sollicitudin porttitor. "; // placeholder text
+
 
 // buttons for all art collections, will also determine their order, [button_id, title]
 let project_buttons = [
@@ -90,29 +96,57 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
 
 
-    // TERMINAL P1
+    // TERMINAL I1 - image terminal
 
-    terminal_p1 = createP(lorem_impsum);
+    terminal_i1 = createP(ascii_image); // lorem_impsum
+    terminal_i1.id('terminal_i1');
+
+    terminal_i1.style('color', secondary_color);
+    terminal_i1.style('font-family', 'monospace'); // 'monospace', 'MonoMEK'
+    terminal_i1.style('font-size', font_size_image);
+
+    terminal_i1.position(random(0, windowWidth / 4), random(0, windowHeight / 4));
+
+    terminal_i1.style('width', '100ch'); // 'ch' - width in characters
+
+    terminal_i1.style('border-style', 'solid');
+    terminal_i1.style('border-width', 'thin');
+    terminal_i1.style('padding', '2ch 2ch'); // '1ch 1ch'
+
+    text_i1_idx = 0;
+    text_i1_input = ascii_image;
+    
+
+
+
+    // TERMINAL P1 - text terminal
+
+    terminal_p1 = createP(lorem_impsum); // lorem_impsum
     terminal_p1.id('terminal_p1');
 
     terminal_p1.style('color', secondary_color);
-    terminal_p1.style('font-family', 'MonoMEK'); // 'monospace'
+    terminal_p1.style('background-color', primary_color);
+    terminal_p1.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
     terminal_p1.style('font-size', font_size_text);
 
-    terminal_p1.position(windowWidth / 2, windowHeight / 2);
+    //terminal_p1.style('letter-spacing', '.065rem'); // rem - root element's font size
+
+    terminal_p1.position(windowWidth / 2, windowHeight / 8);
     //terminal_p1.draggable();
 
     terminal_p1.style('width', '40vmin');
-    terminal_p1.style('height', '20vmin');
+    //terminal_p1.style('height', '20vmin');
 
     terminal_p1.style('border-style', 'solid');
     terminal_p1.style('border-width', 'thin');
-    terminal_p1.style('padding', '1.5vmin 1.5vmin');
+    terminal_p1.style('padding', '2ch 2ch'); // '1.5vmin 1.5vmin'
 
     text_p1_idx = 0;
-    text_p1_input = lorem_impsum;
+    text_p1_input = lorem_impsum; // lorem_impsum
 
 
+
+    
     // PROJECT BUTTONS
 
     // position of the first button in the free-form line
@@ -149,8 +183,16 @@ function draw() {
     text_p1_idx += typing_speed * random(); // position of the last letter in the string
     text_p1 = text_p1_input.slice(0, Math.floor(text_p1_idx)) + '▌'; // blinking_input(lorem_impsum.length, text_p1_idx)
     
-    if (text_p1_idx < text_p1.length + 1) { terminal_p1.html(text_p1); } // update text until all letters are typed, then stop (so we can select the text if needed)
+    if (text_p1_idx < text_p1_input.length + 100) { terminal_p1.html(text_p1); } // update text until all letters are typed, then stop (so we can select the text if needed)
     //else { terminal_p1.html('▌', true); }
+
+
+
+    text_i1_idx += typing_speed * random(); // position of the last letter in the string
+    text_i1 = text_i1_input.slice(0, Math.floor(text_i1_idx)) + '▌';
+    
+    if (text_i1_idx < text_i1_input.length + 100) { terminal_i1.html(text_i1); } // update text until all letters are typed, then stop (so we can select the text if needed)
+
 
     // animate all wireframes
     wireframeAnimation();
@@ -162,6 +204,24 @@ function draw() {
 
 
 
+
+// replace white-space characters and add line breaks
+function formatASCII(input_ascii) {
+    let ascii_no_whitespace = input_ascii.replaceAll(' ', '-'); // replace all white-space with some other character
+    let image_char_width = 100; // length of each line before <br> is inserted
+    let output_ascii = "";
+
+    // insert newline <br> character at regular intervals into the string
+    for (let i = 0; i < ascii_no_whitespace.length; i += image_char_width) {
+        let slice = ascii_no_whitespace.slice(i, i + image_char_width);
+        if (slice.length == image_char_width) { output_ascii += slice + '<br>';}
+        else { output_ascii += slice; }
+    }
+
+    return output_ascii;
+}
+
+
 // creates wireframe points and stores them into an array
 function createWireframe(bound_x, bound_y) {
     // create two random points within bounds
@@ -171,7 +231,6 @@ function createWireframe(bound_x, bound_y) {
     // store both points into a wireframes array
     wireframes.push([wireframe_p1, wireframe_p2]);
 }
-
 
 
 // random jittering lines on the canvas
