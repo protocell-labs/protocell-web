@@ -8,24 +8,26 @@
 
 
 
-let ascii_image = formatASCII(luka_ascii_raw);
-
-
-
+let canvas, ascii_image;
 let primary_color = '#000000'; // black
 let secondary_color = '#00ff00'; // green
 let tertiary_color = '#ff00ff'; // magenta
 
 let terminal_p1, text_p1_input, text_p1, text_p1_idx; // text terminal
-let terminal_i1, text_i1_input, text_ip1, text_i1_idx; // image terminal
+let terminal_i1, text_i1_input, text_ip1, text_i1_idx; // ascii image terminal
+let terminal_i2; // iframe + image terminal
 
 let typing_speed = 50.0; // speed of typing for the text
 let font_size_text = '1.5vmin'; // used for text, '1.5vmin'
-let font_size_image = '0.75vmin'; // used for images
+let font_size_image = '0.5vmin'; // used for images
 let font_size_buttons = '2.0vmin'; // used for buttons
 
-let lorem_impsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nunc id felis sollicitudin porttitor. "; // placeholder text
 
+// top level buttons, will also determine their order, [button_id, title]
+let top_buttons = [
+    ['button_about', 'about'],
+    ['button_code', 'code']
+];
 
 // buttons for all art collections, will also determine their order, [button_id, title]
 let project_buttons = [
@@ -42,9 +44,11 @@ let project_buttons = [
     ['button_unfoldings', 'Unfoldings']
 ];
 
-
 // this will be the text displayed after the corresponding button is clicked - button_id : text
 let button_to_text = {
+    'placeholder': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nunc id felis sollicitudin porttitor. ", // placeholder text
+    'button_about': "{protocell:labs} was founded in 2021 as a digital laboratory that merges artistic and research practices. Within the lab, we explore computational structures, mathematical organizational forms, design algorithms, artificial biology, emergent morphogenesis, and digital graphics. Our preferred mode of expression is chain-agnostic, long-form generative collections, which we began releasing on the fxhash.xyz platform in 2021. These collections often feature a strong emphasis on complex 3D geometry, choreographed animation, and interactivity.<br><br>Team<br><br>Luka Piskorec and Kane Borg met in Helsinki as researchers in the Aalto Design of Structures group. Both are practicing architects with extensive backgrounds in algorithmic design and digital fabrication, and have been teaching and researching at the university level since 2011 (at ETH Zürich and Aalto University). Over the past decade, they have independently co-founded an architecture studio (TEN Studio in Zürich and Belgrade), a computational design consultancy (Borg Markkula Oy in Finland), and a fab lab (in Valletta, Malta). Along the way, they’ve created some weird and wonderful projects. ",
+    'button_code': "As a matter of principle, we keep our code open—unminified, unobfuscated, and available in public repositories like GitHub. It is thoroughly documented through code comments, GitHub commits, articles, and recorded talks to serve as a source of inspiration for others. Additionally, the code for our generative collections is stored on-chain on blockchains such as Ethereum and Tezos, or on decentralized protocols like IPFS. We believe that the development of open generative tools, the fusion of artistic expression with scholarship, and the promotion of responsible Web3 practices are missions that every generative artist should embrace. ",
     'button_unfoldings': "Spatial unfolding of grid lattices obtained through graph algebra operations (Cartesian, strong and tensor products) from basic primitives (path graphs) with node filtering. Simulations are based on Fruchterman and Reingold's method for force-directed placement of nodes which includes both attraction (between nodes connected with edges) as well as repulsion (between all nodes). This collection was produced as an experiment in computational design research on lattice algebras. ",
     'button_morphogens': "Spatial unfolding of grid lattices obtained through graph algebra operations (Cartesian, strong and tensor products) from basic primitives (path graphs) with node filtering. Simulations are based on Fruchterman and Reingold's method for force-directed placement of nodes which includes both attraction (between nodes connected with edges) as well as repulsion (between all nodes). This collection was produced as an experiment in computational design research on lattice algebras. ",
     'button_retroids': "Retroids are primitive artificial life forms that inhabit low-memory digital environments. The first specimens were discovered on old game cartridges salvaged from junkyards and exposed to the elements. In this state, they exist in a digitally frozen form, but once inserted into a powered system, they evolve rapidly before re-uploading themselves back onto the cartridge. This automatic process is prone to frequent errors and glitches due to the physical deterioration of the cartridges, yet it is so deeply ingrained in the retroids that they repeat it endlessly. Their flawed digital evolution is cyclical, trapped in an infinite loop, oscillating between chaos and order in a bounded universe where space is measured in bits and time in CPU cycles - a glimpse into digital purgatory. ",
@@ -60,6 +64,8 @@ let button_to_text = {
 
 // each button can spawn other buttons (like a menu) - button_id : [[button_id_a, title_a, link_a], [button_id_b, title_b, link_b]...]
 let button_spawn = {
+    'button_about': [['button_luka_twitter', 'twitter/X ↗', 'https://twitter.com/LukaPiskorec'], ['button_luka_fc', 'farcaster ↗', 'https://warpcast.com/luka']],
+    'button_code': [['button_code', 'GitHub ↗', 'https://github.com/protocell-labs']],
     'button_unfoldings': [['button_unfoldings_teia', 'teia ↗', 'https://teia.art/luka'], ['button_unfoldings_objkt', 'objkt ↗', 'https://objkt.com/profile/luka/created']],
     'button_morphogens': [['button_morphogens_objkt', 'objkt ↗', 'https://objkt.com/profile/luka/created']],
     'button_retroids': [['button_retroids_nifty', 'nifty ↗', 'https://www.niftygateway.com/marketplace/collection/0x4399af3886a646226c6affcfd6c847c3d1d110cb/6']],
@@ -85,43 +91,71 @@ let button_offset = 40.0; // approximate value the buttons will be offset from e
 let sub_button_offset = 250.0; // horizontal shift of sub-buttons
 let selected_button_sequence = 0; // storing the sequence (relative position) of the selected button
 
-let wireframes = []; // array to store all wireframes
+
 let wireframe_temp = 1.0; // speed of movement of vertices
+let wireframes = []; // array to store all wireframes
 
 
 
 function setup() {
 
-    // canvas will take the full width of the window so we can draw on it, DOM elements are on top
-    createCanvas(windowWidth, windowHeight);
+
+    // TERMINAL I2 - iframe + image terminal
+
+    terminal_i2 = createDiv(); // div element contains blocks like images etc.
+    terminal_i2.position(windowWidth / 2, 5 * windowHeight / 8);
+
+    terminal_i2.style('color', secondary_color);
+    terminal_i2.style('background-color', primary_color);
+
+    terminal_i2.position(0, 0);
+    terminal_i2.style('position', 'absolute');
+    terminal_i2.style('z-index', '0');
+
+    // these three properties are for horizontal and vertical alignment of the image block or the iframe
+    terminal_i2.style('display', 'flex');
+    terminal_i2.style('justify-content', 'center');
+    terminal_i2.style('align-items', 'center');
+
+    // fill up the whole window
+    terminal_i2.style('width', '100%');
+    terminal_i2.style('height', '100%');
+    terminal_i2.style('margin', '0.0vmin');
 
 
-    // TERMINAL I1 - image terminal
+    terminal_i2.html(button_to_iframe['placeholder']); // insert iframe html tag
+    
 
-    terminal_i1 = createP(ascii_image); // lorem_impsum
+    // TERMINAL I1 - ascii image terminal
+
+    terminal_i1 = createP(ascii_image);
     terminal_i1.id('terminal_i1');
 
     terminal_i1.style('color', secondary_color);
+    terminal_i1.style('background-color', primary_color);
     terminal_i1.style('font-family', 'monospace'); // 'monospace', 'MonoMEK'
     terminal_i1.style('font-size', font_size_image);
 
     terminal_i1.position(random(0, windowWidth / 4), random(0, windowHeight / 4));
+    terminal_i1.style('position', 'absolute');
+    terminal_i1.style('z-index', '1');
 
-    terminal_i1.style('width', '100ch'); // 'ch' - width in characters
+    terminal_i1.style('width', 'auto');
 
     terminal_i1.style('border-style', 'solid');
     terminal_i1.style('border-width', 'thin');
-    terminal_i1.style('padding', '2ch 2ch'); // '1ch 1ch'
+    terminal_i1.style('padding', '2ch 2ch');
 
-    text_i1_idx = 0;
+    text_i1_idx = 0; // set counting index to zero
+    ascii_image = formatASCII(button_to_ascii['placeholder']);
+
     text_i1_input = ascii_image;
     
 
 
-
     // TERMINAL P1 - text terminal
 
-    terminal_p1 = createP(lorem_impsum); // lorem_impsum
+    terminal_p1 = createP(button_to_text['placeholder']); // lorem ipsum
     terminal_p1.id('terminal_p1');
 
     terminal_p1.style('color', secondary_color);
@@ -129,26 +163,38 @@ function setup() {
     terminal_p1.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
     terminal_p1.style('font-size', font_size_text);
 
-    //terminal_p1.style('letter-spacing', '.065rem'); // rem - root element's font size
-
     terminal_p1.position(windowWidth / 2, windowHeight / 8);
-    //terminal_p1.draggable();
+    terminal_p1.style('position', 'absolute');
+    terminal_p1.style('z-index', '2');
 
     terminal_p1.style('width', '40vmin');
-    //terminal_p1.style('height', '20vmin');
 
     terminal_p1.style('border-style', 'solid');
     terminal_p1.style('border-width', 'thin');
     terminal_p1.style('padding', '2ch 2ch'); // '1.5vmin 1.5vmin'
 
-    text_p1_idx = 0;
-    text_p1_input = lorem_impsum; // lorem_impsum
+    text_p1_idx = 0; // set counting index to zero
+    text_p1_input = button_to_text['placeholder']; // lorem ipsum
 
+
+
+
+    // TOP LEVEL BUTTONS
+
+    // position of the first button in the free-form line
+    button_arrange_vec = createVector(windowWidth / 16, random(0, windowHeight / 8)); 
+
+    // spawn top level buttons
+    top_buttons.forEach(function (item, index) {
+        button = createButton(item[1]); // create button, item[1] is title
+        applyButtonStyle(button, item[0]); // apply style, item[0] is button_id
+        buttons.push(button); // store button in array
+    });
 
 
     
     // PROJECT BUTTONS
-
+    
     // position of the first button in the free-form line
     button_arrange_vec = createVector(windowWidth / 16, random(windowHeight / 8, windowHeight / 2)); 
     sub_button_arrange_vec = button_arrange_vec.copy().add( createVector(sub_button_offset, button_offset / 2, 0) ); // copied vector but shifted to the right and down
@@ -159,15 +205,30 @@ function setup() {
         applyButtonStyle(button, item[0]); // apply style, item[0] is button_id
         buttons.push(button); // store button in array
     });
+    
+
+
+
+    // canvas will take the full width of the window so we can draw on it
+    canvas = createCanvas(windowWidth, windowHeight);
+
+    canvas.style('position', 'absolute');
+    canvas.style('z-index', '3');
+    canvas.style('pointer-events', 'none'); // ignore mouse events on the canvas so we can interact with the generator on the iframe
+    
+
 
     // WIREFRAMES
+
+    let nr_of_wireframes = Math.floor(random(1, 8)); // number of free-floating wireframes
 
     let wireframe_bound_x = windowWidth / 4; // buffer distance left-right where no wireframe point will be initially placed
     let wireframe_bound_y = windowHeight / 4; // buffer distance top-bottom where no wireframe point will be initially placed
 
-    createWireframe(wireframe_bound_x, wireframe_bound_y);
-    createWireframe(wireframe_bound_x, wireframe_bound_y);
-    createWireframe(wireframe_bound_x, wireframe_bound_y);
+    for (let i = 0; i < nr_of_wireframes; i++) {
+        createWireframe(wireframe_bound_x, wireframe_bound_y);
+    }
+    
 
 }
 
@@ -176,12 +237,12 @@ function setup() {
 
 function draw() {
 
-    background(primary_color);
+    canvas.clear(); // transparent background
 
     //terminal_p1.position(mouseX, mouseY);
 
     text_p1_idx += typing_speed * random(); // position of the last letter in the string
-    text_p1 = text_p1_input.slice(0, Math.floor(text_p1_idx)) + '▌'; // blinking_input(lorem_impsum.length, text_p1_idx)
+    text_p1 = text_p1_input.slice(0, Math.floor(text_p1_idx)) + '▌';
     
     if (text_p1_idx < text_p1_input.length + 100) { terminal_p1.html(text_p1); } // update text until all letters are typed, then stop (so we can select the text if needed)
     //else { terminal_p1.html('▌', true); }
@@ -266,17 +327,18 @@ function blinking_input(text_length, last_letter_idx) {
 }
 
 
-
 // triggers when the mouse moves over the button
 function buttonOver() {
     this.style('color', tertiary_color);
 }
+
 
 // triggers when the mouse moves off the button
 function buttonOut() {
     if (this.elt.id != selected_button) { this.style('color', secondary_color); } // if the button was not clicked, change the color back to original
 
 }
+
 
 // triggers when the mouse is pressed and released over the button
 function buttonClicked() {
@@ -316,6 +378,20 @@ function buttonClicked() {
         sub_buttons.push(button); // store button in array
     });
 
+
+    // load ascii image
+    if (this.elt.id == 'button_code') { // here we are not loading an ascii image but a preformatted code snippet
+        ascii_image = button_to_preformat[this.elt.id];
+    } else { // format and load ascii image
+        ascii_image = formatASCII(button_to_ascii[this.elt.id]);
+    }
+
+    text_i1_idx = 0; // set counting index to zero
+    text_i1_input = ascii_image;
+
+    // load iframe generator
+    terminal_i2.html(button_to_iframe[this.elt.id]); // insert iframe html tag
+
 }
 
 
@@ -329,6 +405,9 @@ function applyButtonStyle(button, button_id) {
 
     button.style('background-color', primary_color);
     button.style('border', 'none');
+
+    button.style('position', 'absolute');
+    button.style('z-index', '4');
 
     button.position(button_arrange_vec.x, button_arrange_vec.y); // position based on this vector
     button_positions.push(button_arrange_vec.copy()); // save position of the button
@@ -344,7 +423,6 @@ function applyButtonStyle(button, button_id) {
 }
 
 
-
 // applies styling to a sub-button
 function applySubButtonStyle(button, button_id) {
     button.id(button_id);
@@ -355,6 +433,9 @@ function applySubButtonStyle(button, button_id) {
 
     button.style('background-color', primary_color);
     button.style('border', 'none');
+
+    button.style('position', 'absolute');
+    button.style('z-index', '4');
 
     button.style('text-decoration-line', 'underline');
     button.style('text-decoration-style', 'dotted');
