@@ -17,10 +17,40 @@ let terminal_p1, text_p1_input, text_p1, text_p1_idx; // text terminal
 let terminal_i1, text_i1_input, text_ip1, text_i1_idx; // ascii image terminal
 let terminal_i2; // iframe + image terminal
 
+let box_to_void_ratio = 1.0; // we start with the full screen of bricks on the intro screen
+let screen_div, intro_counter;
+
 let typing_speed = 50.0; // speed of typing for the text
 let font_size_text = '1.5vmin'; // used for text, '1.5vmin'
 let font_size_image = '0.5vmin'; // used for images
 let font_size_buttons = '2.0vmin'; // used for buttons
+let font_size_intro = '4.0vmin'; // used for intro button
+
+let intro_screen = true;
+let intro_button, text_intro_button, text_intro_button_idx, intro_button_input;
+
+
+
+// module aliases
+var Engine = Matter.Engine,
+    World = Matter.World,
+    Body = Matter.Body,
+    Bodies = Matter.Bodies,
+    Vector = Matter.Vector,
+    Composite = Matter.Composite,
+    Constraint = Matter.Constraint,
+    Mouse = Matter.Mouse,
+    MouseConstraint = Matter.MouseConstraint;
+
+var engine;
+var world;
+var boxes = [];
+var platforms = [];
+var mConstraint;
+
+var create_elements = false;
+var starting_nr_of_bricks;
+
 
 
 // top level buttons, will also determine their order, [button_id, title]
@@ -96,13 +126,154 @@ let wireframe_temp = 1.0; // speed of movement of vertices
 let wireframes = []; // array to store all wireframes
 
 
+// SETUP
 
 function setup() {
+
+    // ORDER of elements
+
+    // intro button - z-index 4
+    // buttons + sub-buttons - z-index 4
+    // canvas - z-index 3
+    // text terminal p1 - z-index 2
+    // ascii image terminal i1 - z-index 1
+    // iframe + image terminal i2 - z-index 0
+
+
+    // canvas will take the full width of the window so we can draw on it
+    canvas = createCanvas(windowWidth, windowHeight);
+
+    canvas.style('position', 'absolute');
+    canvas.style('z-index', '3');
+    //canvas.style('pointer-events', 'none'); // ignore mouse events on the canvas so we can interact with the generator on the iframe
+
+    
+
+    // MASONRY PLAYGROUND
+
+    // create an engine
+    engine = Engine.create();
+    world = engine.world;
+    
+    // zero-gravity
+    world.gravity.y = 0;
+    
+    // create platforms
+    //platforms.push(new Boundary(width/2, 3*height/4, width/2, 25, 0.0));
+    
+    
+    var canvasmouse = Mouse.create(canvas.elt);
+    canvasmouse.pixelRatio = pixelDensity(); // fix mouse coordinate scaling
+    
+    var options = {
+        mouse: canvasmouse
+    }
+    
+    mConstraint = MouseConstraint.create(engine, options);
+    Composite.add(world, mConstraint);
+    
+    var brick_width = 75;
+    var brick_height = 25;
+    
+    var nr_of_bricks_in_width = floor(width / brick_width) + 2;
+    var nr_of_bricks_in_height = floor(height / brick_height) + 2;
+    starting_nr_of_bricks = nr_of_bricks_in_width * nr_of_bricks_in_height;
+    
+    var gradient_part_a = color(0, 255, 255); // cyan 
+    var gradient_part_b = color(255, 0, 255); // magenta
+
+    let intro_font_color = lerpColor(gradient_part_a, gradient_part_b, 0.5);
+
+    // create wall of bricks filling the canvas
+    for (var i = 0; i < nr_of_bricks_in_width; i++) {
+        for (var j = 0; j < nr_of_bricks_in_height; j++) {
+        let gradient = lerpColor(gradient_part_a, gradient_part_b, j / nr_of_bricks_in_height);
+        
+        // running bond
+        let brick_x_shift = j % 2 == 0 ? -brick_width / 4 : brick_width / 4;
+        boxes.push(new Box(i * brick_width + brick_x_shift, j * brick_height, brick_width, brick_height, gradient));
+        }
+    }
+    
+    
+    // remove default for right-click
+    for (var element of document.getElementsByClassName("p5Canvas")) {
+        element.addEventListener("contextmenu", (e) => e.preventDefault());
+    }
+
+
+
+
+    // SCREEN CONTAINER
+
+    screen_div = createDiv(); // div element encompasing the whole screen
+    screen_div.id('screen_div');
+
+    screen_div.style('width', '100%');
+    screen_div.style('height', '100%');
+    screen_div.style('position', 'absolute');
+
+    // these three properties are for horizontal and vertical alignment of elements inside the div
+    screen_div.style('display', 'flex');
+    screen_div.style('justify-content', 'center');
+    screen_div.style('align-items', 'center');
+
+    screen_div.style('background-color', 'transparent');
+    screen_div.style('border', 'none');
+
+    screen_div.style('z-index', '2');
+
+
+    // INTRO BUTTON
+
+    intro_button = createButton(); // create button
+    intro_button.id('button_intro');
+    intro_button.parent(screen_div);
+
+    intro_button.style('color', secondary_color);
+    intro_button.style('font-family', 'MonoMEK'); // 'monospace'
+    intro_button.style('font-size', font_size_intro);
+
+    intro_button.style('background-color', 'transparent');
+    intro_button.style('border', 'none');
+
+    intro_button.style('position', 'absolute');
+    //intro_button.style('z-index', '4'); // will be inherited from the screen_div
+
+    intro_button.mouseOver(buttonOver);
+    intro_button.mouseOut(buttonOut);
+    intro_button.mouseClicked(buttonIntroClicked);
+    
+    intro_button.hide(); // hide at the beginning
+    
+    text_intro_button_idx = 0; // set counting index to zero
+    intro_button_input = "enter('{protocell:labs}');";
+
+
+    // INTRO COUNTER
+    
+    intro_counter = createP();
+    intro_counter.id('intro_counter');
+    intro_counter.parent(screen_div);
+
+    intro_counter.style('color', intro_font_color);
+    intro_counter.style('font-family', 'MonoMEK'); // 'monospace'
+    intro_counter.style('font-size', font_size_intro);
+
+    intro_counter.style('text-align', 'center');
+
+    intro_counter.style('background-color', 'transparent');
+    intro_counter.style('border', 'none');
+
+    intro_counter.style('position', 'absolute');
+    //intro_counter.style('z-index', '2'); // will be inherited from the screen_div
+
 
 
     // TERMINAL I2 - iframe + image terminal
 
     terminal_i2 = createDiv(); // div element contains blocks like images etc.
+    terminal_i2.id('terminal_i2');
     terminal_i2.position(windowWidth / 2, 5 * windowHeight / 8);
 
     terminal_i2.style('color', secondary_color);
@@ -124,6 +295,7 @@ function setup() {
 
 
     terminal_i2.html(button_to_iframe['placeholder']); // insert iframe html tag
+    terminal_i2.hide(); // hide at the beginning
     
 
     // TERMINAL I1 - ascii image terminal
@@ -145,6 +317,8 @@ function setup() {
     terminal_i1.style('border-style', 'solid');
     terminal_i1.style('border-width', 'thin');
     terminal_i1.style('padding', '2ch 2ch');
+
+    terminal_i1.hide(); // hide at the beginning
 
     text_i1_idx = 0; // set counting index to zero
     ascii_image = formatASCII(button_to_ascii['placeholder']);
@@ -173,9 +347,11 @@ function setup() {
     terminal_p1.style('border-width', 'thin');
     terminal_p1.style('padding', '2ch 2ch'); // '1.5vmin 1.5vmin'
 
+    terminal_p1.hide(); // hide at the beginning
+
     text_p1_idx = 0; // set counting index to zero
     text_p1_input = button_to_text['placeholder']; // lorem ipsum
-
+    
 
 
 
@@ -208,16 +384,6 @@ function setup() {
     
 
 
-
-    // canvas will take the full width of the window so we can draw on it
-    canvas = createCanvas(windowWidth, windowHeight);
-
-    canvas.style('position', 'absolute');
-    canvas.style('z-index', '3');
-    canvas.style('pointer-events', 'none'); // ignore mouse events on the canvas so we can interact with the generator on the iframe
-    
-
-
     // WIREFRAMES
 
     let nr_of_wireframes = Math.floor(random(1, 8)); // number of free-floating wireframes
@@ -234,33 +400,140 @@ function setup() {
 
 
 
+// MAIN ANIMATION LOOP
 
 function draw() {
 
     canvas.clear(); // transparent background
 
-    //terminal_p1.position(mouseX, mouseY);
 
-    text_p1_idx += typing_speed * random(); // position of the last letter in the string
-    text_p1 = text_p1_input.slice(0, Math.floor(text_p1_idx)) + '▌';
+    // once 50% of the bricks are cleared from the screen, we can show the rotating animation and intro button
+    if ((box_to_void_ratio < 0.50) && (intro_screen)) {
+
+        intro_button.show(); // show intro button
+        intro_counter.hide(); // hide intro counter
+
+        //screen_div.style('z-index', '4'); // bring the intro_button up front
+        canvas.style('pointer-events', 'none'); // ignore mouse events on the canvas so we can interact with intro button
+
+
+        // animate intro button as typing text
+        text_intro_button_idx += 0.025 * typing_speed * random(); // position of the last letter in the string
+        text_intro_button = intro_button_input.slice(0, Math.floor(text_intro_button_idx)) + '▌';
+        intro_button.html(text_intro_button);
+
+        applyRotationForce(); // applies rotation force on all bricks
+
+    }
+
+
+    if (intro_screen) { // show intro screen
+
+        // update physics engine
+        Engine.update(engine);
+        
+        // determine which bricks to show and which are off screen
+        for (var i = 0; i < boxes.length; i++) {
+            boxes[i].show();
+            
+            // remove boxes that are off screen
+            if (boxes[i].isOffScreen()){
+                boxes[i].removeFromWorld();
+                boxes.splice(i,1);
+                // check the same index again in next iteration (to counteract the splice which shifts the rest of the array)
+                i--; 
+            }
+        }
+        
+        // show platforms
+        for (var i = 0; i < platforms.length; i++) {
+            platforms[i].show();
+        }
+
+        // display intro counter
+        box_to_void_ratio = boxes.length / starting_nr_of_bricks;
+        let intro_counter_string = round(clamp((1 - box_to_void_ratio) * 200, 0, 100)).toString() + '%'
+        if (box_to_void_ratio > 0.65) { intro_counter.html('keep going<br>progress ' + intro_counter_string); }
+        else { intro_counter.html('almost there<br>progress ' + intro_counter_string); }
+
+
+
+    } else { // show main website
+
+        
+
+        text_p1_idx += typing_speed * random(); // position of the last letter in the string
+        text_p1 = text_p1_input.slice(0, Math.floor(text_p1_idx)) + '▌';
+        
+        if (text_p1_idx < text_p1_input.length + 100) { terminal_p1.html(text_p1); } // update text until all letters are typed, then stop (so we can select the text if needed)
+        //else { terminal_p1.html('▌', true); }
+
+
+
+        text_i1_idx += typing_speed * random(); // position of the last letter in the string
+        text_i1 = text_i1_input.slice(0, Math.floor(text_i1_idx)) + '▌';
+        
+        if (text_i1_idx < text_i1_input.length + 100) { terminal_i1.html(text_i1); } // update text until all letters are typed, then stop (so we can select the text if needed)
+
+
+        // animate all wireframes
+        wireframeAnimation();
+
+        // draw line connecting selected project button with its sub-menu
+        drawMenuToSubMenuLine();
+
+    }
+
+
+}
+
+
+
+// applies rotation force on all bricks
+function applyRotationForce() {
+    let strength = 0.0002; // dependent on the size of the bricks as well (inertia)
+    let balancing_f = 0.50; // factor for the balancing centripetal force
     
-    if (text_p1_idx < text_p1_input.length + 100) { terminal_p1.html(text_p1); } // update text until all letters are typed, then stop (so we can select the text if needed)
-    //else { terminal_p1.html('▌', true); }
+    boxes.forEach(function (item, index) {
+        //let from_cent_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), strength); // from the center pf the screen
+        //let to_cent_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), -strength); // to the center of the screen
+        
+        let centripetal_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), -strength * balancing_f); // to the center of the screen, balancing the rotation
+        let rot_force = new Vector.rotate(new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), strength), Math.PI / 2); // rotating force around the center
+
+        Body.applyForce(item.body, item.body.position, rot_force);
+        Body.applyForce(item.body, item.body.position, centripetal_force);
+    });
+
+}
 
 
 
-    text_i1_idx += typing_speed * random(); // position of the last letter in the string
-    text_i1 = text_i1_input.slice(0, Math.floor(text_i1_idx)) + '▌';
+
+// switch from the intro screen to the main website
+function showMainWebsite() {
+    // hide elements
+    intro_screen = false;
+    intro_counter.hide();
+    intro_button.hide();
     
-    if (text_i1_idx < text_i1_input.length + 100) { terminal_i1.html(text_i1); } // update text until all letters are typed, then stop (so we can select the text if needed)
+    // show elements
+    terminal_i1.show();
+    terminal_i2.show();
+    terminal_p1.show();
+    buttons.forEach(function (item, index) {item.show();});
+}
 
 
-    // animate all wireframes
-    wireframeAnimation();
 
-    // draw line connecting selected project button with its sub-menu
-    drawMenuToSubMenuLine();
+// stop matter.js physics engine and clear out elements
+function stopPhysicsEngine() {
+    // clear out boxes array with bricks
+    boxes.forEach(function (item, index) {item.removeFromWorld();});
+    boxes = [];
 
+    World.clear(world);
+    Engine.clear(engine);
 }
 
 
@@ -302,8 +575,14 @@ function wireframeAnimation() {
 
     // draw a line for every pair of wireframe points
     for (let i = 0; i < wireframes.length; i++) {
-        wireframes[i][0].add(createVector(random(-wireframe_temp, wireframe_temp), random(-wireframe_temp, wireframe_temp)));
-        wireframes[i][1].add(createVector(random(-wireframe_temp, wireframe_temp), random(-wireframe_temp, wireframe_temp)));
+        // create random temperature vectors
+        let rand_temp_vec_a = createVector(random(-wireframe_temp, wireframe_temp), random(-wireframe_temp, wireframe_temp));
+        let rand_temp_vec_b = createVector(random(-wireframe_temp, wireframe_temp), random(-wireframe_temp, wireframe_temp));
+
+        // add temperature vectors to vertices
+        wireframes[i][0].add(rand_temp_vec_a);
+        wireframes[i][1].add(rand_temp_vec_b);
+
         line(wireframes[i][0].x, wireframes[i][0].y, wireframes[i][1].x, wireframes[i][1].y);
     }
 }
@@ -323,7 +602,7 @@ function drawMenuToSubMenuLine() {
 function blinking_input(text_length, last_letter_idx) {
     if (last_letter_idx < text_length) { return '▌'; } // no blinking until typing finishes
     else if (Math.floor(frameCount / 20) % 2 == 0) { return '▌'; }
-    else { return ''; }
+    else { return '_'; }
 }
 
 
@@ -336,11 +615,19 @@ function buttonOver() {
 // triggers when the mouse moves off the button
 function buttonOut() {
     if (this.elt.id != selected_button) { this.style('color', secondary_color); } // if the button was not clicked, change the color back to original
-
 }
 
 
-// triggers when the mouse is pressed and released over the button
+
+// triggers when the intro button is clicked
+function buttonIntroClicked() {
+    showMainWebsite();
+    stopPhysicsEngine();
+}
+
+
+
+// triggers when the button is clicked
 function buttonClicked() {
     text_p1_idx = 0;
     text_p1_input = button_to_text[this.elt.id];
@@ -420,6 +707,8 @@ function applyButtonStyle(button, button_id) {
     button.mouseOut(buttonOut);
     button.mouseClicked(buttonClicked);
 
+    button.hide(); // hide at the beginning
+
 }
 
 
@@ -448,6 +737,86 @@ function applySubButtonStyle(button, button_id) {
     button.mouseOver(buttonOver);
     button.mouseOut(buttonOut);
 
+    button.hide(); // hide at the beginning
+
+}
+
+
+
+
+
+function Box(x, y, w, h, c = color(0,0,0)) {
+    var options = {
+      friction: 1.0,
+      restitution: 0.0
+    };
+    
+    // create body
+    this.w = w;
+    this.h = h;
+    this.body = Bodies.rectangle(x, y, this.w, this.h, options);
+    this.c = c;
+    
+    // add body to the world
+    Composite.add(world, this.body);
+    
+    // check if body is off screen
+    this.isOffScreen = function() {
+      var pos = this.body.position;
+      // returns true if outside of screen
+      return ((pos.x > width + 100) || (pos.x < -100) || (pos.y > height + 100) || (pos.y < -100));
+    }
+    
+    // remove body from the world
+    this.removeFromWorld = function () {
+      Composite.remove(world, this.body);
+    }
+    
+    this.show = function() {
+      var pos = this.body.position;
+      var angle = this.body.angle;
+      push();
+      translate(pos.x, pos.y);
+      rotate(angle);
+      rectMode(CENTER);
+      noStroke();
+      fill(this.c); // white brick
+      rect(0, 0, this.w, this.h);
+      pop();
+    }
+    
+}
+
+
+function Boundary(x, y, w, h, a) {
+    var options = {
+      friction: 1.0,
+      restitution: 0.0,
+      angle: a,
+      isStatic: true
+    };
+    
+    // create body
+    this.w = w;
+    this.h = h;
+    this.body = Bodies.rectangle(x, y, this.w, this.h, options);
+    
+    // add body to the world
+    Composite.add(world, this.body);
+    
+    this.show = function() {
+      var pos = this.body.position;
+      var angle = this.body.angle;
+      push();
+      translate(pos.x, pos.y);
+      rotate(angle);
+      rectMode(CENTER);
+      noStroke();
+      fill(0);
+      rect(0, 0, this.w, this.h);
+      pop();
+    }
+    
 }
 
 

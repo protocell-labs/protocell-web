@@ -45,7 +45,7 @@ let button_to_preformat = {
 
 
 let button_to_iframe = {
-    'placeholder': '<iframe src="https://protocell-labs.github.io/monocell/" width="100%" height="100%" frameBorder="0" scrolling="no" id="iframe_monocell"></iframe>', // monocell is used as a placeholder
+    'placeholder': '',
     'button_about': '<img src="assets/albedo_wave_transition_v5.gif" width="100%" height="auto" id="iframe_retroids">',
     'button_code':  '<img src="assets/gibson_neuromancer_landscape_signal_parsing_02.gif" width="100%" height="auto" id="iframe_code">',
 
