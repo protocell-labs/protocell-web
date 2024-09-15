@@ -118,12 +118,9 @@ let sub_button_positions = []; // store positions of the sub-buttons
 let sub_buttons = []; // array to store all sub-buttons
 let button_arrange_vec, sub_button_arrange_vec, sub_button_arrange_vec_copy; // these vector will help us arrange buttons in a free-form line
 let button_offset = 40.0; // approximate value the buttons will be offset from each other
-let sub_button_offset = 250.0; // horizontal shift of sub-buttons
+let sub_button_offset = 200.0; // horizontal shift of sub-buttons
 let selected_button_sequence = 0; // storing the sequence (relative position) of the selected button
 
-
-let wireframe_temp = 1.0; // speed of movement of vertices
-let wireframes = []; // array to store all wireframes
 
 
 // SETUP
@@ -145,7 +142,6 @@ function setup() {
 
     canvas.style('position', 'absolute');
     canvas.style('z-index', '3');
-    //canvas.style('pointer-events', 'none'); // ignore mouse events on the canvas so we can interact with the generator on the iframe
 
     
 
@@ -238,7 +234,6 @@ function setup() {
     intro_button.style('border', 'none');
 
     intro_button.style('position', 'absolute');
-    //intro_button.style('z-index', '4'); // will be inherited from the screen_div
 
     intro_button.mouseOver(buttonOver);
     intro_button.mouseOut(buttonOut);
@@ -266,37 +261,34 @@ function setup() {
     intro_counter.style('border', 'none');
 
     intro_counter.style('position', 'absolute');
-    //intro_counter.style('z-index', '2'); // will be inherited from the screen_div
 
 
 
     // TERMINAL I2 - iframe + image terminal
-
+    
     terminal_i2 = createDiv(); // div element contains blocks like images etc.
     terminal_i2.id('terminal_i2');
-    terminal_i2.position(windowWidth / 2, 5 * windowHeight / 8);
 
     terminal_i2.style('color', secondary_color);
     terminal_i2.style('background-color', primary_color);
-
-    terminal_i2.position(0, 0);
-    terminal_i2.style('position', 'absolute');
-    terminal_i2.style('z-index', '0');
-
-    // these three properties are for horizontal and vertical alignment of the image block or the iframe
-    terminal_i2.style('display', 'flex');
-    terminal_i2.style('justify-content', 'center');
-    terminal_i2.style('align-items', 'center');
 
     // fill up the whole window
     terminal_i2.style('width', '100%');
     terminal_i2.style('height', '100%');
     terminal_i2.style('margin', '0.0vmin');
 
+    // these three properties are for horizontal and vertical alignment of the image block or the iframe
+    terminal_i2.style('display', 'flex'); // we have to set this again when we show the element as it will automatically switch to 'block' and mess up image centering
+    terminal_i2.style('justify-content', 'center');
+    terminal_i2.style('align-items', 'center');
+    
+    terminal_i2.style('position', 'absolute');
+    terminal_i2.style('z-index', '0');
 
-    terminal_i2.html(button_to_iframe['placeholder']); // insert iframe html tag
+    //terminal_i2.html(button_to_iframe['placeholder']); // insert iframe html tag
     terminal_i2.hide(); // hide at the beginning
     
+
 
     // TERMINAL I1 - ascii image terminal
 
@@ -382,18 +374,6 @@ function setup() {
         buttons.push(button); // store button in array
     });
     
-
-
-    // WIREFRAMES
-
-    let nr_of_wireframes = Math.floor(random(1, 8)); // number of free-floating wireframes
-
-    let wireframe_bound_x = windowWidth / 4; // buffer distance left-right where no wireframe point will be initially placed
-    let wireframe_bound_y = windowHeight / 4; // buffer distance top-bottom where no wireframe point will be initially placed
-
-    for (let i = 0; i < nr_of_wireframes; i++) {
-        createWireframe(wireframe_bound_x, wireframe_bound_y);
-    }
     
 
 }
@@ -413,9 +393,7 @@ function draw() {
         intro_button.show(); // show intro button
         intro_counter.hide(); // hide intro counter
 
-        //screen_div.style('z-index', '4'); // bring the intro_button up front
         canvas.style('pointer-events', 'none'); // ignore mouse events on the canvas so we can interact with intro button
-
 
         // animate intro button as typing text
         text_intro_button_idx += 0.025 * typing_speed * random(); // position of the last letter in the string
@@ -440,8 +418,7 @@ function draw() {
             if (boxes[i].isOffScreen()){
                 boxes[i].removeFromWorld();
                 boxes.splice(i,1);
-                // check the same index again in next iteration (to counteract the splice which shifts the rest of the array)
-                i--; 
+                i--; // check the same index again in next iteration (to counteract the splice which shifts the rest of the array)
             }
         }
         
@@ -460,8 +437,7 @@ function draw() {
 
     } else { // show main website
 
-        
-
+        // terminal p1 - text
         text_p1_idx += typing_speed * random(); // position of the last letter in the string
         text_p1 = text_p1_input.slice(0, Math.floor(text_p1_idx)) + '▌';
         
@@ -469,23 +445,62 @@ function draw() {
         //else { terminal_p1.html('▌', true); }
 
 
-
+        // terminal i1 - ascii image
         text_i1_idx += typing_speed * random(); // position of the last letter in the string
         text_i1 = text_i1_input.slice(0, Math.floor(text_i1_idx)) + '▌';
         
         if (text_i1_idx < text_i1_input.length + 100) { terminal_i1.html(text_i1); } // update text until all letters are typed, then stop (so we can select the text if needed)
 
 
-        // animate all wireframes
-        wireframeAnimation();
-
         // draw line connecting selected project button with its sub-menu
         drawMenuToSubMenuLine();
+
+        animateButtons();
 
     }
 
 
 }
+
+
+
+
+
+
+///////////////////////////// EFFECTS /////////////////////////////
+
+
+// applies animation to all buttons
+function animateButtons() {
+
+    // animate main buttons
+    buttons.forEach(function (item, index) {
+        let current_pos = button_positions[index].copy();
+        let noise_vec = createVector(1.0 * (0.5 - noise(0.005 * frameCount + index)), 0); // noise() returns a number in range [0, 1]
+        let new_pos = current_pos.add(noise_vec);
+
+        // move button only if it will still remain within defined limits
+        if ((new_pos.x > 0) && (new_pos.x < windowWidth / 8)) {
+            item.position(new_pos.x, new_pos.y); // position based on this vector
+            button_positions[index] = new_pos.copy(); // save position of the button
+        }
+    });
+
+    // animate sub-buttons
+    sub_buttons.forEach(function (item, index) {
+        let current_pos = sub_button_positions[index].copy();
+        let noise_vec = createVector(1.0 * (0.5 - noise(0.005 * frameCount + index + 111)), 0); // noise() returns a number in range [0, 1], 111 is an arbitrary noise offset from the main buttons
+        let new_pos = current_pos.add(noise_vec);
+
+        // move button only if it will still remain within defined limits
+        if ((new_pos.x > windowWidth / 8) && (new_pos.x < windowWidth / 2)) {
+            item.position(new_pos.x, new_pos.y); // position based on this vector
+            sub_button_positions[index] = new_pos.copy(); // save position of the sub-button
+        }
+    });
+
+}
+
 
 
 
@@ -515,11 +530,17 @@ function showMainWebsite() {
     // hide elements
     intro_screen = false;
     intro_counter.hide();
+
     intro_button.hide();
+    //intro_button.style('animation-name', 'zoom_in');
+    //intro_button.style('animation-duration', '1s');
+    screen_div.hide();
     
     // show elements
     terminal_i1.show();
     terminal_i2.show();
+    terminal_i2.style('display', 'flex'); // for some reason we have to set this again as it reverts to 'none' when the element is hidden and later set to 'block' when shown
+
     terminal_p1.show();
     buttons.forEach(function (item, index) {item.show();});
 }
@@ -556,43 +577,14 @@ function formatASCII(input_ascii) {
 }
 
 
-// creates wireframe points and stores them into an array
-function createWireframe(bound_x, bound_y) {
-    // create two random points within bounds
-    let wireframe_p1 = createVector(random(bound_x, windowWidth - bound_x), random(bound_y, windowHeight - bound_y));
-    let wireframe_p2 = createVector(random(bound_x, windowWidth - bound_x), random(bound_y, windowHeight - bound_y));
-
-    // store both points into a wireframes array
-    wireframes.push([wireframe_p1, wireframe_p2]);
-}
-
-
-// random jittering lines on the canvas
-function wireframeAnimation() {
-    // set wireframe line styling
-    stroke(secondary_color);
-    strokeWeight(1.0);
-
-    // draw a line for every pair of wireframe points
-    for (let i = 0; i < wireframes.length; i++) {
-        // create random temperature vectors
-        let rand_temp_vec_a = createVector(random(-wireframe_temp, wireframe_temp), random(-wireframe_temp, wireframe_temp));
-        let rand_temp_vec_b = createVector(random(-wireframe_temp, wireframe_temp), random(-wireframe_temp, wireframe_temp));
-
-        // add temperature vectors to vertices
-        wireframes[i][0].add(rand_temp_vec_a);
-        wireframes[i][1].add(rand_temp_vec_b);
-
-        line(wireframes[i][0].x, wireframes[i][0].y, wireframes[i][1].x, wireframes[i][1].y);
-    }
-}
 
 
 // draw line connecting selected project button with its sub-menu
 function drawMenuToSubMenuLine() {
     if (selected_button != '') {
         stroke(secondary_color);
-        strokeWeight(1.0);
+        strokeWeight(1.5);
+
         let right_shift = 0.5 * selected_button_label.length * min(windowWidth, windowHeight) * 0.02; // min(windowWidth, windowHeight) * 0.02 corresponds to css units 2.0vmin
         line(button_positions[selected_button_sequence].x + right_shift, button_positions[selected_button_sequence].y + 0.4 * button_offset, sub_button_positions[0].x, sub_button_positions[0].y + 0.4 * button_offset);
     }
@@ -621,9 +613,55 @@ function buttonOut() {
 
 // triggers when the intro button is clicked
 function buttonIntroClicked() {
-    showMainWebsite();
     stopPhysicsEngine();
+    showMainWebsite();
+    setStartState(); // manually "clicks" about button at the very start
 }
+
+
+
+// manually "clicks" about button at the very start
+function setStartState() {
+    text_p1_idx = 0;
+    text_p1_input = button_to_text['button_about'];
+
+    // change color of the clicked button to selected
+    buttons[0].style('color', tertiary_color);
+
+    // save the id and label of the clicked button
+    selected_button = 'button_about';
+    selected_button_label = buttons[0].elt.innerHTML;
+
+    // remove previous sub-buttons
+    if (sub_buttons.length != 0) {
+        sub_buttons.forEach(function (item, index) { item.remove(); });
+        sub_buttons = [];
+    } 
+
+    // reset position vector, shifted to the right and down from the button
+    sub_button_arrange_vec_copy = button_positions[0].copy().add( createVector(sub_button_offset, button_offset / 2, 0) );
+
+    // reset sub-button positions
+    sub_button_positions = [];
+
+    // spawn sub-buttons
+    button_spawn[selected_button].forEach(function (item, index) {
+        button = createA(item[2], item[1], '_blank'); // item[2] is link, item[1] is title, '_blank' parameter makes the link open in a new tab
+        applySubButtonStyle(button, item[0]); // apply style, item[0] is button_id
+        sub_buttons.push(button); // store button in array
+    });
+
+    // format and load ascii image
+    ascii_image = formatASCII(button_to_ascii['button_about']);
+    
+    text_i1_idx = 0; // set counting index to zero
+    text_i1_input = ascii_image;
+
+    // load iframe generator (also image or video)
+    terminal_i2.html(button_to_iframe['button_about']); // insert image/video html tag
+    
+}
+
 
 
 
@@ -676,7 +714,7 @@ function buttonClicked() {
     text_i1_idx = 0; // set counting index to zero
     text_i1_input = ascii_image;
 
-    // load iframe generator
+    // load iframe generator (also image or video)
     terminal_i2.html(button_to_iframe[this.elt.id]); // insert iframe html tag
 
 }
@@ -737,7 +775,7 @@ function applySubButtonStyle(button, button_id) {
     button.mouseOver(buttonOver);
     button.mouseOut(buttonOut);
 
-    button.hide(); // hide at the beginning
+    //button.hide(); // hide at the beginning
 
 }
 
