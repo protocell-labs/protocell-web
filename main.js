@@ -55,7 +55,9 @@ var brick_width = 75;
 var brick_height = 25;
 var gradient_part_a, gradient_part_b;
 
-
+var rotating_force = true; // rotating force applied to the bricks after intro counter triggers
+var repulsing_force = false; // repulsing force applied to the bricks after intro button is clicked
+var physics_on = true; // run matter.js physics engine while the main site is shown for a brief period
 
 let selected_button = ''; // save the id of the clicked button
 let selected_button_label = ''; // save the label of the clicked button
@@ -122,16 +124,22 @@ function draw() {
         canvas.style('pointer-events', 'none'); // ignore mouse events on the canvas so we can interact with intro button
 
         typingButton(); // animate intro button as typing text
-        applyRotationForce(); // applies rotation force on all bricks
+
+        if (rotating_force) { applyRotationForce(); } // applies rotation force on all bricks (center of rotation is at screen center)
+        if (repulsing_force) { applyRepulsingForce(0.05); } // applies repulsing force on all bricks (from screen center), only parameter is force strength
     }
 
 
     if (intro_screen) { // show intro screen
 
-        runPhysics(); // update physics engine and remove elements that are off screen
+        if (physics_on) { runPhysics(); } // update physics engine and remove elements that are off screen
         showIntroCounter(); // display intro counter - counts bricks that are outside of the screen
 
     } else { // show main website
+
+        if (physics_on) { runPhysics(); } // update physics engine and remove elements that are off screen
+        if (rotating_force) { applyRotationForce(); } // applies rotation force on all bricks (center of rotation is at screen center)
+        if (repulsing_force) { applyRepulsingForce(0.01); } // applies repulsing force on all bricks (from screen center)
 
         // terminal p1 - text
         text_p1_idx = typingEffect(text_p1_idx, text_p1, text_p1_input, terminal_p1); // type out portion of the input text and return the current index

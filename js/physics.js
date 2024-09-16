@@ -164,18 +164,13 @@ function showIntroCounter() {
 
 
 
-// applies rotation force on all bricks
+// applies rotation force on all bricks (center of rotation is at screen center)
 function applyRotationForce() {
     let strength = 0.0002; // dependent on the size of the bricks as well (inertia)
     let balancing_f = 0.50; // factor for the balancing centripetal force
-    
     boxes.forEach(function (item, index) {
-        //let from_cent_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), strength); // from the center pf the screen
-        //let to_cent_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), -strength); // to the center of the screen
-        
         let centripetal_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), -strength * balancing_f); // to the center of the screen, balancing the rotation
         let rot_force = new Vector.rotate(new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), strength), Math.PI / 2); // rotating force around the center
-
         Body.applyForce(item.body, item.body.position, rot_force);
         Body.applyForce(item.body, item.body.position, centripetal_force);
     });
@@ -184,12 +179,42 @@ function applyRotationForce() {
 
 
 
+// applies repulsing force on all bricks (from screen center)
+function applyRepulsingForce(strength) {
+    // strength is dependent on the size of the bricks as well (inertia)
+    boxes.forEach(function (item, index) {
+        let from_cent_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), strength); // from the center of the screen
+        Body.applyForce(item.body, item.body.position, from_cent_force);
+    });
+
+}
+
+
+
+// applies attracting force on all bricks (towards the screen center) - NOT CURRENTLY USED
+function applyAttractingForce(strength) {
+    // strength is dependent on the size of the bricks as well (inertia)
+    boxes.forEach(function (item, index) {
+        let to_cent_force = new Vector.mult(new Vector.normalise(new Vector.sub(item.body.position, new Vector.create(width / 2, height / 2))), -strength); // to the center of the screen
+        Body.applyForce(item.body, item.body.position, to_cent_force);
+    });
+
+}
+
+
+
 // stop matter.js physics engine and clear out elements
 function stopPhysicsEngine() {
+    // stop running engine and apply forces while the main site is shown
+    physics_on = false;
+    rotating_force = false;
+    repulsing_force = false;
+
     // clear out boxes array with bricks
     boxes.forEach(function (item, index) {item.removeFromWorld();});
     boxes = [];
 
+    // clear out all elements from the engine and shut it down
     World.clear(world);
     Engine.clear(engine);
 }

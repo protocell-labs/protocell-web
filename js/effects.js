@@ -257,6 +257,8 @@ function showMainWebsite() {
 
     terminal_p1.show();
     buttons.forEach(function (item, index) {item.show();});
+
+    setStartState(); // manually "clicks" about button at the very start
 }
 
 
@@ -316,10 +318,11 @@ function buttonOut() {
 
 // triggers when the intro button is clicked
 function buttonIntroClicked() {
-    stopPhysicsEngine();
-    showMainWebsite();
-    setStartState(); // manually "clicks" about button at the very start
+    showMainWebsite(); // close intro page and show main website
+    repulsing_force = true;; // activate repulsing force on the bricks
+    setTimeout(stopPhysicsEngine, 3000); // stops matter.js physics engine and clears the brick elements
 }
+
 
 
 
