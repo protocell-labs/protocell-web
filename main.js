@@ -16,19 +16,25 @@ let tertiary_color = '#ff00ff'; // magenta
 let terminal_p1, text_p1_input, text_p1, text_p1_idx; // text terminal
 let terminal_i1, text_i1_input, text_i1, text_i1_idx; // ascii image terminal
 let terminal_i2; // iframe + image terminal
+let header, header_div, header_input, text_header, header_idx; // {protocell:labs}
+let footer, footer_div, footer_input, text_footer, footer_idx;; // website source code
+let frame_p1, bar_p1;
 
 let box_to_void_ratio = 1.0; // we start with the full screen of bricks on the intro screen
 let screen_div, intro_counter;
 
-let typing_speed = 50.0; // speed of typing for the text
+let typing_speed = 25.0; // speed of typing for the text
 let font_size_text = '1.5vmin'; // used for text, '1.5vmin'
-let font_size_image = '0.5vmin'; // used for images
+let font_size_image = '0.72vmin'; // used for images, '0.5vmin'
 let font_size_buttons = '2.0vmin'; // used for buttons
 let font_size_intro = '4.0vmin'; // used for intro button
+let font_size_bar = '20px'; // used for bar labels above terminals
+let bar_height = '25px'; // in pixels so we can easily calculate top / left offset on the screen
 
 let intro_screen = true;
 let intro_button, text_intro_button, text_intro_button_idx, intro_button_input;
 
+let stickyNote;
 
 
 // module aliases
@@ -104,7 +110,10 @@ function setup() {
     createTerminalP1(); // terminal p1 - text terminal
     createTopLevelButtons(); // about, code
     createProjectButtons(); // T E C T O N I C A, rtrdgtzr, Structura...
+    createHeader(); // {protocell:labs}
+    createFooter(); // website source code
  
+    calculateDraggableBarOffset(); // calculate offset of draggable bar elements, and use it to position terminals (which are themselves not draggable)
 }
 
 
@@ -142,13 +151,21 @@ function draw() {
         if (repulsing_force) { applyRepulsingForce(0.01); } // applies repulsing force on all bricks (from screen center)
 
         // terminal p1 - text
-        text_p1_idx = typingEffect(text_p1_idx, text_p1, text_p1_input, terminal_p1); // type out portion of the input text and return the current index
+        text_p1_idx = typingEffect(text_p1_idx, text_p1, text_p1_input, terminal_p1, typing_speed); // type out portion of the input text and return the current index
 
         // terminal i1 - ascii image
-        text_i1_idx = typingEffect(text_i1_idx, text_i1, text_i1_input, terminal_i1); // type out portion of the input text and return the current index
+        text_i1_idx = typingEffect(text_i1_idx, text_i1, text_i1_input, terminal_i1, typing_speed * 2); // type out portion of the input text and return the current index
+
+        // {protocell:labs}
+        header_idx = typingEffect(header_idx, text_header, header_input, header, typing_speed / 50); // type out portion of the input text and return the current index
+        
+        // website source code
+        footer_idx = typingEffect(footer_idx, text_footer, footer_input, footer, typing_speed / 50); // type out portion of the input text and return the current index
 
         drawMenuToSubMenuLine(); // draw line connecting selected project button with its sub-menu
         animateButtons(); // animate buttons - they move left-rigth within predetermined bounds
+
+        calculateDraggableBarOffset(); // calculate offset of draggable bar elements, and use it to position terminals (which are themselves not draggable)
     }
 
 }

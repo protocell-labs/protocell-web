@@ -75,6 +75,28 @@ function createIntroCounter() {
 
 // terminal i1 - ascii image terminal
 function createTerminalI1() {
+    // draggable bar
+
+    bar_i1 = createDiv();
+    bar_i1.id('bar_i1');
+    bar_i1.position(random(0, windowWidth / 4), random(0, windowHeight / 2));
+    bar_i1.style('width', '43vmin');
+    bar_i1.style('height', bar_height); // bar_height
+    bar_i1.style('z-index', '2');
+    bar_i1.style('color', primary_color);
+    bar_i1.style('background-color', secondary_color);
+    bar_i1.style('border-color', secondary_color);
+    bar_i1.style('border-style', 'solid');
+    bar_i1.style('border-width', 'thin');
+
+    bar_i1.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
+    bar_i1.style('font-size', font_size_bar);
+
+    bar_i1.draggable(); // make element draggable
+    bar_i1.hide();
+
+    // terminal - position will be relative to the bar above - calculateDraggableBarOffset() function
+
     terminal_i1 = createP(ascii_image);
     terminal_i1.id('terminal_i1');
 
@@ -83,22 +105,23 @@ function createTerminalI1() {
     terminal_i1.style('font-family', 'monospace'); // 'monospace', 'MonoMEK'
     terminal_i1.style('font-size', font_size_image);
 
-    terminal_i1.position(random(0, windowWidth / 4), random(0, windowHeight / 4));
     terminal_i1.style('position', 'absolute');
+    terminal_i1.style('width', '40vmin'); // 'auto'
+    terminal_i1.style('height', 'auto');
     terminal_i1.style('z-index', '1');
-
-    terminal_i1.style('width', 'auto');
 
     terminal_i1.style('border-style', 'solid');
     terminal_i1.style('border-width', 'thin');
-    terminal_i1.style('padding', '2ch 2ch');
+    terminal_i1.style('padding', '1.5vmin 1.5vmin'); // '2ch 2ch'
+    terminal_i1.style('margin', '0');
 
     terminal_i1.hide(); // hide at the beginning
 
     text_i1_idx = 0; // set counting index to zero
     ascii_image = formatASCII(button_to_ascii['placeholder']);
 
-    text_i1_input = ascii_image;
+    text_i1_input = ascii_image + '<br>&bsol;> ';
+
 }
 
 
@@ -132,28 +155,158 @@ function createTerminalI2() {
 
 // terminal p1 - text terminal
 function createTerminalP1() {
-    terminal_p1 = createP(button_to_text['placeholder']); // lorem ipsum
+    // draggable bar
+
+    bar_p1 = createDiv();
+    bar_p1.id('bar_p1');
+    bar_p1.position(windowWidth / 2, random(windowHeight / 8, windowHeight / 2));
+    bar_p1.style('width', '43vmin');
+    bar_p1.style('height', bar_height); // bar_height
+    bar_p1.style('z-index', '2');
+    bar_p1.style('color', primary_color);
+    bar_p1.style('background-color', secondary_color);
+    bar_p1.style('border-color', secondary_color);
+    bar_p1.style('border-style', 'solid');
+    bar_p1.style('border-width', 'thin');
+
+    bar_p1.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
+    bar_p1.style('font-size', font_size_bar);
+
+    bar_p1.draggable(); // make element draggable
+    bar_p1.hide();
+
+    // terminal - position will be relative to the bar above - calculateDraggableBarOffset() function
+
+    terminal_p1 = createDiv(button_to_text['placeholder']);
     terminal_p1.id('terminal_p1');
+
+    terminal_p1.style('position', 'absolute');
+    terminal_p1.style('width', '40vmin');
+    terminal_p1.style('height', 'auto');
+    terminal_p1.style('z-index', '2');
 
     terminal_p1.style('color', secondary_color);
     terminal_p1.style('background-color', primary_color);
     terminal_p1.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
     terminal_p1.style('font-size', font_size_text);
 
-    terminal_p1.position(windowWidth / 2, windowHeight / 8);
-    terminal_p1.style('position', 'absolute');
-    terminal_p1.style('z-index', '2');
-
-    terminal_p1.style('width', '40vmin');
-
     terminal_p1.style('border-style', 'solid');
     terminal_p1.style('border-width', 'thin');
-    terminal_p1.style('padding', '2ch 2ch'); // '1.5vmin 1.5vmin'
+    terminal_p1.style('padding', '1.5vmin 1.5vmin'); // '1.5vmin 1.5vmin', '2ch 2ch'
+    terminal_p1.style('margin', '0');
 
-    terminal_p1.hide(); // hide at the beginning
+    terminal_p1.hide();
 
     text_p1_idx = 0; // set counting index to zero
     text_p1_input = button_to_text['placeholder']; // lorem ipsum
+
+}
+
+
+
+// calculate offset of draggable bar elements, and use it to position terminals (which are themselves not draggable)
+function calculateDraggableBarOffset() {
+    // bar_p1
+
+    let bar_p1_el = document.getElementById('bar_p1');
+    let terminal_p1_el = document.getElementById('terminal_p1');
+
+    let top_offset_p1 = bar_p1_el.getBoundingClientRect().top + 25; // offset for bar_height = '25 px'
+    let left_offset_p1 = bar_p1_el.getBoundingClientRect().left;
+
+    terminal_p1_el.style.top = top_offset_p1.toString() + 'px';
+    terminal_p1_el.style.left = left_offset_p1.toString() + 'px';
+
+    // bar_i1
+
+    let bar_i1_el = document.getElementById('bar_i1');
+    let terminal_i1_el = document.getElementById('terminal_i1');
+
+    let top_offset_i1 = bar_i1_el.getBoundingClientRect().top + 25; // offset for bar_height = '25 px'
+    let left_offset_i1 = bar_i1_el.getBoundingClientRect().left;
+
+    terminal_i1_el.style.top = top_offset_i1.toString() + 'px';
+    terminal_i1_el.style.left = left_offset_i1.toString() + 'px';
+
+}
+
+
+
+
+// {protocell:labs}
+function createHeader() {
+
+    header_div = createDiv()
+    header_div.id('header_div');
+
+    header_div.style('width', '100%');
+    header_div.style('top', font_size_buttons);
+    header_div.style('background-color', 'transparent');
+    header_div.style('border', 'none');
+    header_div.style('position', 'absolute');
+    header_div.style('z-index', '4');
+
+    // these three properties are for horizontal and vertical alignment of elements inside the div
+    header_div.style('display', 'flex');
+    header_div.style('justify-content', 'center');
+    header_div.style('align-items', 'center');
+
+    header = createP('{protocell:labs} ');
+    header.parent(header_div);
+    header.id('header');
+
+    header.style('color', secondary_color);
+    header.style('background-color', primary_color);
+    header.style('border', 'none');
+    header.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
+    header.style('font-size', font_size_buttons);
+
+    header.style('position', 'absolute');
+    
+    header.hide(); // hide at the beginning
+
+    header_idx = 0; // set counting index to zero
+    header_input = '{protocell:labs} ';
+
+}
+
+
+
+// website source code
+function createFooter() {
+    
+    footer_div = createDiv()
+    footer_div.id('footer_div');
+
+    footer_div.style('width', '100%');
+    footer_div.style('bottom', font_size_buttons);
+    footer_div.style('background-color', 'transparent');
+    footer_div.style('border', 'none');
+    footer_div.style('position', 'absolute');
+    footer_div.style('z-index', '4');
+
+    // these three properties are for horizontal and vertical alignment of elements inside the div
+    footer_div.style('display', 'flex');
+    footer_div.style('justify-content', 'center');
+    footer_div.style('align-items', 'center');
+
+    footer = createA('https://github.com/protocell-labs', 'clone website from GitHub ↗', '_blank'); // link, title, '_blank' parameter makes the link open in a new tab
+    footer.parent(footer_div);
+    footer.id('footer');
+
+    footer.style('color', secondary_color);
+    footer.style('background-color', primary_color);
+    footer.style('border', 'none');
+    footer.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
+    footer.style('font-size', font_size_buttons);
+
+    footer.style('position', 'absolute');
+    
+    footer.hide(); // hide at the beginning
+
+    footer_idx = 0; // set counting index to zero
+    footer_input = 'clone website from GitHub ↗ ';
+
 }
 
 
@@ -176,7 +329,7 @@ function createTopLevelButtons() {
 // T E C T O N I C A, rtrdgtzr, Structura...
 function createProjectButtons() {
     // position of the first button in the free-form line
-    button_arrange_vec = createVector(windowWidth / 16, random(windowHeight / 8, windowHeight / 2)); 
+    button_arrange_vec = createVector(windowWidth / 16, random(windowHeight / 4, windowHeight / 2)); 
     sub_button_arrange_vec = button_arrange_vec.copy().add( createVector(sub_button_offset, button_offset / 2, 0) ); // copied vector but shifted to the right and down
 
     // spawn main project buttons
@@ -190,8 +343,8 @@ function createProjectButtons() {
 
 
 // typing-out effect
-function typingEffect(text_idx, text, text_input, terminal) {
-    text_idx += typing_speed * random(); // position of the last letter in the string
+function typingEffect(text_idx, text, text_input, terminal, speed) {
+    text_idx += speed * random(); // position of the last letter in the string
     text = text_input.slice(0, Math.floor(text_idx)) + '▌';
     if (text_idx < text_input.length + 100) { terminal.html(text); } // update text until all letters are typed, then stop (so we can select the text if needed)
     return text_idx; // return current index - it will be stored globaly so we can track how much text is already typed out
@@ -201,7 +354,7 @@ function typingEffect(text_idx, text, text_input, terminal) {
 
 // animate intro button as typing text
 function typingButton() {
-    text_intro_button_idx += 0.025 * typing_speed * random(); // position of the last letter in the string
+    text_intro_button_idx += 0.050 * typing_speed * random(); // position of the last letter in the string
     text_intro_button = intro_button_input.slice(0, Math.floor(text_intro_button_idx)) + '▌';
     intro_button.html(text_intro_button);
 }
@@ -255,8 +408,18 @@ function showMainWebsite() {
     terminal_i2.show();
     terminal_i2.style('display', 'flex'); // for some reason we have to set this again as it reverts to 'none' when the element is hidden and later set to 'block' when shown
 
+    bar_p1.show();
+    bar_i1.show();
+    bar_p1.html('&nbsp;' + selected_button_label);
+    bar_i1.html('&nbsp;CCSID 437');
+
     terminal_p1.show();
     buttons.forEach(function (item, index) {item.show();});
+
+    header.show();
+    footer.show();
+    header_div.style('display', 'flex');
+    footer_div.style('display', 'flex');
 
     setStartState(); // manually "clicks" about button at the very start
 }
@@ -361,10 +524,17 @@ function setStartState() {
     ascii_image = formatASCII(button_to_ascii['button_about']);
     
     text_i1_idx = 0; // set counting index to zero
-    text_i1_input = ascii_image;
+    text_i1_input = ascii_image + '<br>&bsol;> ';
 
     // load iframe generator (also image or video)
     terminal_i2.html(button_to_iframe['button_about']); // insert image/video html tag
+
+    header_idx = 0; // set counting index to zero
+    footer_idx = 0; // set counting index to zero
+
+    // show button label on the bar
+    bar_p1.html('&nbsp;' + selected_button_label);
+    bar_i1.html('&nbsp;CCSID 437');
     
 }
 
@@ -418,12 +588,20 @@ function buttonClicked() {
     }
 
     text_i1_idx = 0; // set counting index to zero
-    text_i1_input = ascii_image;
+    text_i1_input = ascii_image + '<br>&bsol;> ';
 
     // load iframe generator (also image or video)
     terminal_i2.html(button_to_iframe[this.elt.id]); // insert iframe html tag
 
+    header_idx = 0; // set counting index to zero
+    footer_idx = 0; // set counting index to zero
+
+    // show button label on the bar
+    bar_p1.html('&nbsp;' + selected_button_label);
+    bar_i1.html('&nbsp;CCSID 437');
+
 }
+
 
 
 // applies styling to a button
@@ -454,6 +632,7 @@ function applyButtonStyle(button, button_id) {
     button.hide(); // hide at the beginning
 
 }
+
 
 
 // applies styling to a sub-button
