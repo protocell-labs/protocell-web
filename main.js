@@ -26,9 +26,8 @@ let screen_div, intro_counter;
 let typing_speed = 25.0; // speed of typing for the text
 let font_size_text = '1.5vmin'; // used for text, '1.5vmin'
 let font_size_image = '0.72vmin'; // used for images, '0.5vmin'
-let font_size_buttons = '2.0vmin'; // used for buttons
+let font_size_buttons = '1.75vmin'; // used for buttons, '2.0vmin'
 let font_size_intro = '4.0vmin'; // used for intro button
-let font_size_bar = '20px'; // used for bar labels above terminals
 let bar_height = '25px'; // in pixels so we can easily calculate top / left offset on the screen
 
 let intro_screen = true;
@@ -72,10 +71,13 @@ let button_positions = []; // store positions of the buttons
 let sub_button_positions = []; // store positions of the sub-buttons
 let sub_buttons = []; // array to store all sub-buttons
 let button_arrange_vec, sub_button_arrange_vec, sub_button_arrange_vec_copy; // these vector will help us arrange buttons in a free-form line
-let button_offset = 40.0; // approximate value the buttons will be offset from each other
-let sub_button_offset = 200.0; // horizontal shift of sub-buttons
+let button_offset = 4.0; // approximate value the buttons will be offset from each other, 40.0
+let sub_button_offset = 300.0; // horizontal shift of sub-buttons
 let selected_button_sequence = 0; // storing the sequence (relative position) of the selected button
 
+let button_y_start; // vertical height of the first button - defined inside createTopLevelButtons()
+let buttons_idx_y_gap = 2; // button sequence index after which there is gap appearing - separates top level buttons from project buttons
+let buttons_y_gap_size = 2; // size of the gap between buttons in number of places
 
 
 // SETUP

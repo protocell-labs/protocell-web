@@ -75,11 +75,12 @@ function createIntroCounter() {
 
 // terminal i1 - ascii image terminal
 function createTerminalI1() {
+
     // draggable bar
 
     bar_i1 = createDiv();
     bar_i1.id('bar_i1');
-    bar_i1.position(random(0, windowWidth / 4), random(0, windowHeight / 2));
+    bar_i1.position(windowWidth / 4, random(0, windowHeight / 2));
     bar_i1.style('width', '43vmin');
     bar_i1.style('height', bar_height); // bar_height
     bar_i1.style('z-index', '2');
@@ -90,7 +91,8 @@ function createTerminalI1() {
     bar_i1.style('border-width', 'thin');
 
     bar_i1.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
-    bar_i1.style('font-size', font_size_bar);
+    bar_i1.style('font-size', font_size_buttons);
+    bar_i1.style('line-height', bar_height);
 
     bar_i1.draggable(); // make element draggable
     bar_i1.hide();
@@ -155,6 +157,7 @@ function createTerminalI2() {
 
 // terminal p1 - text terminal
 function createTerminalP1() {
+
     // draggable bar
 
     bar_p1 = createDiv();
@@ -170,7 +173,8 @@ function createTerminalP1() {
     bar_p1.style('border-width', 'thin');
 
     bar_p1.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
-    bar_p1.style('font-size', font_size_bar);
+    bar_p1.style('font-size', font_size_buttons);
+    bar_p1.style('line-height', bar_height);
 
     bar_p1.draggable(); // make element draggable
     bar_p1.hide();
@@ -302,6 +306,9 @@ function createFooter() {
 
     footer.style('position', 'absolute');
     
+    footer.mouseOver(buttonOver);
+    footer.mouseOut(buttonOut);
+
     footer.hide(); // hide at the beginning
 
     footer_idx = 0; // set counting index to zero
@@ -313,8 +320,11 @@ function createFooter() {
 
 // about, code
 function createTopLevelButtons() {
+    // set vertical height of the first button
+    button_y_start = windowHeight / 16;
+
     // position of the first button in the free-form line
-    button_arrange_vec = createVector(windowWidth / 16, random(0, windowHeight / 8)); 
+    button_arrange_vec = createVector(windowWidth / 16, button_y_start); 
 
     // spawn top level buttons
     top_buttons.forEach(function (item, index) {
@@ -330,7 +340,7 @@ function createTopLevelButtons() {
 function createProjectButtons() {
     // position of the first button in the free-form line
     button_arrange_vec = createVector(windowWidth / 16, random(windowHeight / 4, windowHeight / 2)); 
-    sub_button_arrange_vec = button_arrange_vec.copy().add( createVector(sub_button_offset, button_offset / 2, 0) ); // copied vector but shifted to the right and down
+    sub_button_arrange_vec = button_arrange_vec.copy().add( createVector(sub_button_offset, button_offset / 2) ); // copied vector but shifted to the right and down
 
     // spawn main project buttons
     project_buttons.forEach(function (item, index) {
@@ -366,28 +376,43 @@ function animateButtons() {
 
     // animate main buttons
     buttons.forEach(function (item, index) {
+        let y_gap = index > buttons_idx_y_gap ? buttons_y_gap_size : 0; // introducing a gap that separates top level buttons from project buttons
+        let y_shift = windowWidth < windowHeight ? 0.01 * windowWidth * (index + y_gap) : 0.01 * windowHeight * (index + y_gap);
+
         let current_pos = button_positions[index].copy();
         let noise_vec = createVector(1.0 * (0.5 - noise(0.005 * frameCount + index)), 0); // noise() returns a number in range [0, 1]
         let new_pos = current_pos.add(noise_vec);
+        new_pos.y = button_y_start + button_offset * y_shift;
 
         // move button only if it will still remain within defined limits
         if ((new_pos.x > 0) && (new_pos.x < windowWidth / 8)) {
             item.position(new_pos.x, new_pos.y); // position based on this vector
             button_positions[index] = new_pos.copy(); // save position of the button
+        } else { // otherwise, we only shift in y and leave x position the same
+            item.position(current_pos.x, new_pos.y); // position based on this vector
+            button_positions[index].y = new_pos.y; // save position of the button
         }
+
     });
 
     // animate sub-buttons
     sub_buttons.forEach(function (item, index) {
+        let y_shift = windowWidth < windowHeight ? 0.01 * windowWidth * index : 0.01 * windowHeight * index;
+
         let current_pos = sub_button_positions[index].copy();
         let noise_vec = createVector(1.0 * (0.5 - noise(0.005 * frameCount + index + 111)), 0); // noise() returns a number in range [0, 1], 111 is an arbitrary noise offset from the main buttons
         let new_pos = current_pos.add(noise_vec);
+        new_pos.y = sub_button_positions[0].y + button_offset * y_shift;
 
         // move button only if it will still remain within defined limits
         if ((new_pos.x > windowWidth / 8) && (new_pos.x < windowWidth / 2)) {
             item.position(new_pos.x, new_pos.y); // position based on this vector
             sub_button_positions[index] = new_pos.copy(); // save position of the sub-button
+        } else { // otherwise, we only shift in y and leave x position the same
+            item.position(current_pos.x, new_pos.y); // position based on this vector
+            sub_button_positions[index].y = new_pos.y; // save position of the button
         }
+
     });
 }
 
@@ -452,7 +477,6 @@ function drawMenuToSubMenuLine() {
     if (selected_button != '') {
         stroke(secondary_color);
         strokeWeight(1.5);
-
         let right_shift = 0.5 * selected_button_label.length * min(windowWidth, windowHeight) * 0.02; // min(windowWidth, windowHeight) * 0.02 corresponds to css units 2.0vmin
         line(button_positions[selected_button_sequence].x + right_shift, button_positions[selected_button_sequence].y + 0.4 * button_offset, sub_button_positions[0].x, sub_button_positions[0].y + 0.4 * button_offset);
     }
@@ -488,7 +512,6 @@ function buttonIntroClicked() {
 
 
 
-
 // manually "clicks" about button at the very start
 function setStartState() {
     text_p1_idx = 0;
@@ -508,7 +531,7 @@ function setStartState() {
     } 
 
     // reset position vector, shifted to the right and down from the button
-    sub_button_arrange_vec_copy = button_positions[0].copy().add( createVector(sub_button_offset, button_offset / 2, 0) );
+    sub_button_arrange_vec_copy = button_positions[0].copy().add( createVector(sub_button_offset, button_offset / 2) );
 
     // reset sub-button positions
     sub_button_positions = [];
@@ -545,7 +568,7 @@ function setStartState() {
 function buttonClicked() {
     text_p1_idx = 0;
     text_p1_input = button_to_text[this.elt.id];
-    
+
     // change color of all buttons back to the original
     buttons.forEach(function (item, index) { item.style('color', secondary_color); });
 
@@ -567,7 +590,7 @@ function buttonClicked() {
     buttons.forEach(function (item, index) { if (item.elt.id == clicked_button_id) { selected_button_sequence = index}; });
 
     // reset position vector, shifted to the right and down from the button
-    sub_button_arrange_vec_copy = button_positions[selected_button_sequence].copy().add( createVector(sub_button_offset, button_offset / 2, 0) );
+    sub_button_arrange_vec_copy = button_positions[selected_button_sequence].copy().add( createVector(sub_button_offset, button_offset / 2) );
 
     // reset sub-button positions
     sub_button_positions = [];
