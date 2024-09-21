@@ -14,6 +14,7 @@ let secondary_color = '#00ff00'; // green
 let tertiary_color = '#ff00ff'; // magenta
 
 let terminal_p1, text_p1_input, text_p1, text_p1_idx; // text terminal
+let terminal_p2, text_p2_input, text_p2, text_p2_idx; // project data terminal
 let terminal_i1, text_i1_input, text_i1, text_i1_idx; // ascii image terminal
 let terminal_i2; // iframe + image terminal
 let header, header_div, header_input, text_header, header_idx; // {protocell:labs}
@@ -70,6 +71,8 @@ let buttons = []; // array to store all buttons
 let button_positions = []; // store positions of the buttons
 let sub_button_positions = []; // store positions of the sub-buttons
 let sub_buttons = []; // array to store all sub-buttons
+let selected_sub_button = ''; // save the id of the clicked sub-button
+let selected_sub_button_label = ''; // save the label of the clicked sub-button
 let button_arrange_vec, sub_button_arrange_vec, sub_button_arrange_vec_copy; // these vector will help us arrange buttons in a free-form line
 let button_offset = 4.0; // approximate value the buttons will be offset from each other, 40.0
 let sub_button_offset = 300.0; // horizontal shift of sub-buttons
@@ -110,6 +113,7 @@ function setup() {
     createTerminalI1(); // terminal i1 - ascii image terminal
     createTerminalI2(); // terminal i2 - iframe + image terminal
     createTerminalP1(); // terminal p1 - text terminal
+    createTerminalP2(); // terminal p2 - project data terminal
     createTopLevelButtons(); // about, code
     createProjectButtons(); // T E C T O N I C A, rtrdgtzr, Structura...
     createHeader(); // {protocell:labs}
@@ -148,21 +152,17 @@ function draw() {
 
     } else { // show main website
 
+        // run matter.ja physics at the beginning to let the transition play out - will be switched off soon after initialization 
         if (physics_on) { runPhysics(); } // update physics engine and remove elements that are off screen
         if (rotating_force) { applyRotationForce(); } // applies rotation force on all bricks (center of rotation is at screen center)
         if (repulsing_force) { applyRepulsingForce(0.01); } // applies repulsing force on all bricks (from screen center)
 
-        // terminal p1 - text
-        text_p1_idx = typingEffect(text_p1_idx, text_p1, text_p1_input, terminal_p1, typing_speed); // type out portion of the input text and return the current index
-
-        // terminal i1 - ascii image
-        text_i1_idx = typingEffect(text_i1_idx, text_i1, text_i1_input, terminal_i1, typing_speed * 2); // type out portion of the input text and return the current index
-
-        // {protocell:labs}
-        header_idx = typingEffect(header_idx, text_header, header_input, header, typing_speed / 50); // type out portion of the input text and return the current index
-        
-        // website source code
-        footer_idx = typingEffect(footer_idx, text_footer, footer_input, footer, typing_speed / 50); // type out portion of the input text and return the current index
+        // typing text effects
+        text_p1_idx = typingEffect(text_p1_idx, text_p1, text_p1_input, terminal_p1, typing_speed); // terminal p1 - text - type out portion of the input text and return the current index
+        text_p2_idx = typingEffect(text_p2_idx, text_p2, text_p2_input, terminal_p2, typing_speed); // terminal p2 - project data - type out portion of the input text and return the current index
+        text_i1_idx = typingEffect(text_i1_idx, text_i1, text_i1_input, terminal_i1, typing_speed * 2); // terminal i1 - ascii image - type out portion of the input text and return the current index
+        header_idx = typingEffect(header_idx, text_header, header_input, header, typing_speed / 50); // {protocell:labs} - type out portion of the input text and return the current index
+        footer_idx = typingEffect(footer_idx, text_footer, footer_input, footer, typing_speed / 50); // website source code - type out portion of the input text and return the current index
 
         drawMenuToSubMenuLine(); // draw line connecting selected project button with its sub-menu
         animateButtons(); // animate buttons - they move left-rigth within predetermined bounds

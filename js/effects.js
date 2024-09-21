@@ -208,6 +208,59 @@ function createTerminalP1() {
 
 
 
+// terminal p2 - project data terminal
+function createTerminalP2() {
+
+    // draggable bar
+
+    bar_p2 = createDiv();
+    bar_p2.id('bar_p2');
+    bar_p2.position(3 * windowWidth / 8, random(windowHeight / 2, 2 * windowHeight / 3));
+    bar_p2.style('width', '28vmin');
+    bar_p2.style('height', bar_height); // bar_height
+    bar_p2.style('z-index', '2');
+    bar_p2.style('color', primary_color);
+    bar_p2.style('background-color', secondary_color);
+    bar_p2.style('border-color', secondary_color);
+    bar_p2.style('border-style', 'solid');
+    bar_p2.style('border-width', 'thin');
+
+    bar_p2.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
+    bar_p2.style('font-size', font_size_buttons);
+    bar_p2.style('line-height', bar_height);
+
+    bar_p2.draggable(); // make element draggable
+    bar_p2.hide();
+
+    // terminal - position will be relative to the bar above - calculateDraggableBarOffset() function
+
+    terminal_p2 = createDiv(button_to_text['placeholder']);
+    terminal_p2.id('terminal_p2');
+
+    terminal_p2.style('position', 'absolute');
+    terminal_p2.style('width', '25vmin');
+    terminal_p2.style('height', 'auto');
+    terminal_p2.style('z-index', '2');
+
+    terminal_p2.style('color', secondary_color);
+    terminal_p2.style('background-color', primary_color);
+    terminal_p2.style('font-family', 'MonoMEK'); // 'monospace', 'MonoMEK'
+    terminal_p2.style('font-size', font_size_text);
+
+    terminal_p2.style('border-style', 'solid');
+    terminal_p2.style('border-width', 'thin');
+    terminal_p2.style('padding', '1.5vmin 1.5vmin'); // '1.5vmin 1.5vmin', '2ch 2ch'
+    terminal_p2.style('margin', '0');
+
+    terminal_p2.hide();
+
+    text_p2_idx = 0; // set counting index to zero
+    text_p2_input = button_to_data['placeholder']; // lorem ipsum
+
+}
+
+
+
 // calculate offset of draggable bar elements, and use it to position terminals (which are themselves not draggable)
 function calculateDraggableBarOffset() {
     // bar_p1
@@ -221,6 +274,17 @@ function calculateDraggableBarOffset() {
     terminal_p1_el.style.top = top_offset_p1.toString() + 'px';
     terminal_p1_el.style.left = left_offset_p1.toString() + 'px';
 
+    // bar_p2
+
+    let bar_p2_el = document.getElementById('bar_p2');
+    let terminal_p2_el = document.getElementById('terminal_p2');
+
+    let top_offset_p2 = bar_p2_el.getBoundingClientRect().top + 25; // offset for bar_height = '25 px'
+    let left_offset_p2 = bar_p2_el.getBoundingClientRect().left;
+
+    terminal_p2_el.style.top = top_offset_p2.toString() + 'px';
+    terminal_p2_el.style.left = left_offset_p2.toString() + 'px';
+    
     // bar_i1
 
     let bar_i1_el = document.getElementById('bar_i1');
@@ -434,11 +498,15 @@ function showMainWebsite() {
     terminal_i2.style('display', 'flex'); // for some reason we have to set this again as it reverts to 'none' when the element is hidden and later set to 'block' when shown
 
     bar_p1.show();
+    bar_p2.show();
     bar_i1.show();
     bar_p1.html('&nbsp;' + selected_button_label);
+    bar_p2.html('&nbsp;data');
     bar_i1.html('&nbsp;CCSID 437');
 
     terminal_p1.show();
+    terminal_p2.show();
+
     buttons.forEach(function (item, index) {item.show();});
 
     header.show();
@@ -502,6 +570,11 @@ function buttonOut() {
 }
 
 
+// triggers when the mouse moves off the sub-button
+function buttonSubOut() {
+    if (this.elt.id != selected_sub_button) { this.style('color', secondary_color); } // if the sub-button was not clicked, change the color back to original
+}
+
 
 // triggers when the intro button is clicked
 function buttonIntroClicked() {
@@ -514,8 +587,7 @@ function buttonIntroClicked() {
 
 // manually "clicks" about button at the very start
 function setStartState() {
-    text_p1_idx = 0;
-    text_p1_input = button_to_text['button_about'];
+
 
     // change color of the clicked button to selected
     buttons[0].style('color', tertiary_color);
@@ -538,10 +610,25 @@ function setStartState() {
 
     // spawn sub-buttons
     button_spawn[selected_button].forEach(function (item, index) {
-        button = createA(item[2], item[1], '_blank'); // item[2] is link, item[1] is title, '_blank' parameter makes the link open in a new tab
-        applySubButtonStyle(button, item[0]); // apply style, item[0] is button_id
-        sub_buttons.push(button); // store button in array
+        if (item[2] == 'internal') { // item[2] is type of button - 'internal'
+            button = createButton(item[1]); // item[1] is title
+            applySubButtonStyle(button, item[0]); // apply style, item[0] is button_id
+            sub_buttons.push(button); // store button in array
+        } else { // item[2] is type of button - 'external'
+            button = createA(item[3], item[1], '_blank'); // item[3] is link, item[1] is title, '_blank' parameter makes the link open in a new tab
+            applySubButtonLinkStyle(button, item[0]); // apply style, item[0] is button_id
+            sub_buttons.push(button); // store button in array
+        }
     });
+
+    // load terminal text
+    text_p1_idx = 0;
+    text_p1_input = button_to_text['button_about'];
+
+    // load project data
+    text_p2_idx = 0;
+    // button_to_data is of the form [type, status, editions, released, chain, storage, platform]
+    text_p2_input = 'type:&nbsp;&nbsp;&nbsp;&nbsp; ' + button_to_data['button_about'][0] + '<br>status:&nbsp;&nbsp; ' + button_to_data['button_about'][1] + '<br>editions: ' + button_to_data['button_about'][2] + '<br>released: ' + button_to_data['button_about'][3] + '<br>chain:&nbsp;&nbsp;&nbsp; ' + button_to_data['button_about'][4] + '<br>storage:&nbsp; ' + button_to_data['button_about'][5] + '<br>platform: ' + button_to_data['button_about'][6] + '<br>&bsol;> ';
 
     // format and load ascii image
     ascii_image = formatASCII(button_to_ascii['button_about']);
@@ -566,9 +653,6 @@ function setStartState() {
 
 // triggers when the button is clicked
 function buttonClicked() {
-    text_p1_idx = 0;
-    text_p1_input = button_to_text[this.elt.id];
-
     // change color of all buttons back to the original
     buttons.forEach(function (item, index) { item.style('color', secondary_color); });
 
@@ -597,11 +681,25 @@ function buttonClicked() {
 
     // spawn sub-buttons
     button_spawn[selected_button].forEach(function (item, index) {
-        button = createA(item[2], item[1], '_blank'); // item[2] is link, item[1] is title, '_blank' parameter makes the link open in a new tab
-        applySubButtonStyle(button, item[0]); // apply style, item[0] is button_id
-        sub_buttons.push(button); // store button in array
+        if (item[2] == 'internal') { // item[2] is type of button - 'internal'
+            button = createButton(item[1]); // item[1] is title
+            applySubButtonStyle(button, item[0]); // apply style, item[0] is button_id
+            sub_buttons.push(button); // store button in array
+        } else { // item[2] is type of button - 'external'
+            button = createA(item[3], item[1], '_blank'); // item[3] is link, item[1] is title, '_blank' parameter makes the link open in a new tab
+            applySubButtonLinkStyle(button, item[0]); // apply style, item[0] is button_id
+            sub_buttons.push(button); // store button in array
+        }
     });
 
+    // load terminal text
+    text_p1_idx = 0;
+    text_p1_input = button_to_text[this.elt.id];
+
+    // load project data
+    text_p2_idx = 0;
+    // button_to_data is of the form [type, status, editions, released, chain, storage, platform]
+    text_p2_input = 'type:&nbsp;&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][0] + '<br>status:&nbsp;&nbsp; ' + button_to_data[this.elt.id][1] + '<br>editions: ' + button_to_data[this.elt.id][2] + '<br>released: ' + button_to_data[this.elt.id][3] + '<br>chain:&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][4] + '<br>storage:&nbsp; ' + button_to_data[this.elt.id][5] + '<br>platform: ' + button_to_data[this.elt.id][6] + '<br>&bsol;> ';
 
     // load ascii image
     if (this.elt.id == 'button_code') { // here we are not loading an ascii image but a preformatted code snippet
@@ -624,6 +722,28 @@ function buttonClicked() {
     bar_i1.html('&nbsp;CCSID 437');
 
 }
+
+
+
+
+// triggers when the sub-button is clicked if it is NOT a link (!) - otherwise, there is no click event for a sub-button aside from opening an external link
+function buttonSubClicked() {
+    // change color of all sub-buttons back to the original
+    sub_buttons.forEach(function (item, index) { item.style('color', secondary_color); });
+
+    // change color of the clicked sub-button to selected
+    this.style('color', tertiary_color);
+
+    // save the id and label of the clicked button
+    selected_sub_button = this.elt.id;
+    selected_sub_button_label = this.elt.innerHTML;
+
+    // load terminal text
+    text_p1_idx = 0;
+    text_p1_input = button_to_text[this.elt.id];
+    
+}
+
 
 
 
@@ -658,8 +778,8 @@ function applyButtonStyle(button, button_id) {
 
 
 
-// applies styling to a sub-button
-function applySubButtonStyle(button, button_id) {
+// applies styling to a sub-button that is a link
+function applySubButtonLinkStyle(button, button_id) {
     button.id(button_id);
 
     button.style('color', secondary_color);
@@ -683,4 +803,33 @@ function applySubButtonStyle(button, button_id) {
     button.mouseOver(buttonOver);
     button.mouseOut(buttonOut);
 
+}
+
+
+// applies styling to a sub-button
+function applySubButtonStyle(button, button_id) {
+    button.id(button_id);
+
+    button.style('color', secondary_color);
+    button.style('font-family', 'MonoMEK'); // 'monospace'
+    button.style('font-size', font_size_buttons);
+
+    button.style('background-color', primary_color);
+    button.style('border', 'none');
+
+    button.style('position', 'absolute');
+    button.style('z-index', '4');
+
+    button.style('text-decoration-line', 'underline');
+    button.style('text-decoration-style', 'dotted');
+    button.style('text-decoration-thickness', '1px');
+
+    button.position(sub_button_arrange_vec_copy.x, sub_button_arrange_vec_copy.y); // position based on this vector
+    sub_button_positions.push(sub_button_arrange_vec_copy.copy()); // save position of the sub-button
+    sub_button_arrange_vec_copy.add(createVector(random(-button_offset, button_offset), button_offset)); // move position vector with some randomness
+
+    button.mouseOver(buttonOver);
+    button.mouseOut(buttonSubOut);
+
+    button.mouseClicked(buttonSubClicked);
 }

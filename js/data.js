@@ -5,7 +5,7 @@
 // top level buttons, will also determine their order, [button_id, title]
 let top_buttons = [
     ['button_about', 'about'],
-    ['button_code', 'code'],
+    ['button_videos', 'videos'],
     ['button_articles', 'articles']
 ];
 
@@ -28,10 +28,15 @@ let project_buttons = [
 
 // this will be the text displayed after the corresponding button is clicked - button_id : text
 let button_to_text = {
-    'placeholder': "&bsol;> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nunc id felis sollicitudin porttitor. ", // placeholder text
-    'button_about': "&bsol;> {protocell:labs} was founded in 2021 as a digital laboratory that merges artistic and research practices. Within the lab, we explore computational structures, mathematical organizational forms, design algorithms, artificial biology, emergent morphogenesis, and digital graphics. Our preferred mode of expression is chain-agnostic, long-form generative collections, which we began releasing on the fxhash.xyz platform in 2021. These collections often feature a strong emphasis on complex 3D geometry, choreographed animation, and interactivity.<br><br>Team<br><br>Luka Piskorec and Kane Borg met in Helsinki as researchers in the Aalto Design of Structures group. Both are practicing architects with extensive backgrounds in algorithmic design and digital fabrication, and have been teaching and researching at the university level since 2011 (at ETH Zürich and Aalto University). Over the past decade, they have independently co-founded an architecture studio (TEN Studio in Zürich and Belgrade), a computational design consultancy (Borg Markkula Oy in Finland), and a fab lab (in Valletta, Malta). Along the way, they’ve created some weird and wonderful projects.<br>&bsol;> ",
-    'button_code': "&bsol;> As a matter of principle, we keep our code open—unminified, unobfuscated, and available in public repositories like GitHub. It is thoroughly documented through code comments, GitHub commits, articles, and recorded talks to serve as a source of inspiration for others. Additionally, the code for our generative collections is stored on-chain on blockchains such as Ethereum and Tezos, or on decentralized protocols like IPFS. We believe that the development of open generative tools, the fusion of artistic expression with scholarship, and the promotion of responsible Web3 practices are missions that every generative artist should embrace.<br>&bsol;> ",
-    'button_articles': '&bsol;> ',
+    'placeholder': "&bsol;> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nunc id felis sollicitudin porttitor.<br>&bsol;> ", // placeholder text
+    'button_about': "&bsol;> {protocell:labs} was founded in 2021 as a digital laboratory that merges artistic and research practices. Within the lab, we explore computational structures, mathematical organizational forms, design algorithms, artificial biology, emergent morphogenesis, and digital graphics. Our preferred mode of expression is chain-agnostic, long-form generative collections, which we began releasing on the fxhash.xyz platform in 2021. These collections often feature a strong emphasis on complex 3D geometry, choreographed animation, and interactivity.<br><br>As a matter of principle, we keep our code open—unminified, unobfuscated, and available in public repositories like GitHub. It is thoroughly documented through code comments, GitHub commits, articles, and recorded talks to serve as a source of inspiration for others. Additionally, the code for our generative collections is stored on-chain on blockchains such as Ethereum and Tezos, or on decentralized protocols like IPFS. We believe that the development of open generative tools, the fusion of artistic expression with scholarship, and the promotion of responsible Web3 practices are missions that every generative artist should embrace.<br><br>Team<br><br>Luka Piskorec and Kane Borg met in Helsinki as researchers in the Aalto Design of Structures group. Both are practicing architects with extensive backgrounds in algorithmic design and digital fabrication, and have been teaching and researching at the university level since 2011 (at ETH Zürich and Aalto University). Over the past decade, they have independently co-founded an architecture studio (TEN Studio in Zürich and Belgrade), a computational design consultancy (Borg Markkula Oy in Finland), and a fab lab (in Valletta, Malta). Along the way, they’ve created some weird and wonderful projects.<br>&bsol;> ",
+    
+    'button_videos': '&bsol;> Selection of trailers, project reels, short movies, lectures and other {protocell:labs} video productions.<br>&bsol;> ',
+    'button_all_is_motion': '<video autoplay controls loop src="assets/protocell_labs_all_is_motion_2024_medium_bitrate.mp4" width="100%" height="auto" id="video_all_is_motion">',
+    'button_tectonica_logs': '<video autoplay controls loop src="assets/tectonica_logs_final_240211_full_twitter_720p.mp4" width="100%" height="auto" id="video_tectonica_logs">',
+    'button_second_law': '<video autoplay controls loop src="assets/second_law_short_movie.mp4" width="100%" height="auto" id="video_second_law">',
+
+    'button_articles': '&bsol;> Selection of articles and interviews.<br>&bsol;> ',
     'button_unfoldings': "&bsol;> Spatial unfolding of grid lattices obtained through graph algebra operations (Cartesian, strong and tensor products) from basic primitives (path graphs) with node filtering. Simulations are based on Fruchterman and Reingold's method for force-directed placement of nodes which includes both attraction (between nodes connected with edges) as well as repulsion (between all nodes). This collection was produced as an experiment in computational design research on lattice algebras.<br>&bsol;> ",
     'button_morphogens': "&bsol;> Spatial unfolding of grid lattices obtained through graph algebra operations (Cartesian, strong and tensor products) from basic primitives (path graphs) with node filtering. Simulations are based on Fruchterman and Reingold's method for force-directed placement of nodes which includes both attraction (between nodes connected with edges) as well as repulsion (between all nodes). This collection was produced as an experiment in computational design research on lattice algebras.<br>&bsol;> ",
     'button_retroids': "&bsol;> Retroids are primitive artificial life forms that inhabit low-memory digital environments. The first specimens were discovered on old game cartridges salvaged from junkyards and exposed to the elements. In this state, they exist in a digitally frozen form, but once inserted into a powered system, they evolve rapidly before re-uploading themselves back onto the cartridge. This automatic process is prone to frequent errors and glitches due to the physical deterioration of the cartridges, yet it is so deeply ingrained in the retroids that they repeat it endlessly. Their flawed digital evolution is cyclical, trapped in an infinite loop, oscillating between chaos and order in a bounded universe where space is measured in bits and time in CPU cycles - a glimpse into digital purgatory.<br>&bsol;> ",
@@ -48,62 +53,68 @@ let button_to_text = {
 
 // each button can spawn other buttons (like a menu) - button_id : [[button_id_a, title_a, link_a], [button_id_b, title_b, link_b]...]
 let button_spawn = {
-    'button_about': [['button_luka_twitter', 'twitter/X ↗', 'https://twitter.com/LukaPiskorec'],
-                    ['button_luka_fc', 'farcaster ↗', 'https://warpcast.com/luka']],
+    'button_about': [['button_luka_twitter', 'twitter/X ↗', 'external', 'https://twitter.com/LukaPiskorec'],
+                    ['button_luka_fc', 'farcaster ↗', 'external', 'https://warpcast.com/luka'],
+                    ['button_luka_rodeo', 'rodeo ↗', 'external', 'https://rodeo.club/@luka/posts'],
+                    ['button_youtube', 'youtube ↗', 'external', 'https://youtube.com/channel/UCKU2V7XcdJw9mYfhg2xWtkA?si=KG0cn7nNaSqtnMxL'],
+                    ['button_github', 'github ↗', 'external', 'https://github.com/protocell-labs']],
 
-    'button_code': [['button_code', 'GitHub ↗', 'https://github.com/protocell-labs']],
+    'button_videos':    [['button_all_is_motion', 'All Is Motion - 2021-2024 project reel', 'internal', ''],
+                        ['button_tectonica_logs', 'T E C T O N I C A logs - collection trailer', 'internal', ''],
+                        ['button_second_law', 'Second Law - short movie', 'internal', ''],
+                        ['button_genart_lecture', 'Gen Art and Digital Assets - lecture ↗', 'external', 'https://youtu.be/pIXZrX3NShE?si=aeLh-ldpwaX_ykNI']],
     
-    'button_articles':  [['button_article_', 'T E C T O N I C A - article by The Culture Project ↗', 'https://thecultureproject.substack.com/p/tectonica-by-protocelllabs'],
-                        ['button_article_', "rtrdgtzr - Minter's Guide ↗", "https://www.fxhash.xyz/article/rtrdgtzr-minter's-guide"],
-                        ['button_article_', 'Generative Architecture: Questions and Answers with Artists & Curators ↗', 'https://verse.works/journal/generative-architecture-questions-and-answers-with-artists-curators'],
-                        ['button_article_', 'Glitchverse: Interview with Jarid Scott and Luka Piškorec by Brady Evan Walker ↗', 'https://mirror.xyz/sgtslaughtermelon.eth/gvMxqRMKYd5_DwvkXfen1sbiiz6EEjsXAoTjrUBYuHY'],
-                        ['button_article_', 'O B S C V R V M - Algorithms and Code ↗', 'https://www.fxhash.xyz/article/o-b-s-c-v-r-v-m-algorithms-and-code']],
+    'button_articles':  [['button_article_1', 'T E C T O N I C A - article by The Culture Project ↗', 'external', 'https://thecultureproject.substack.com/p/tectonica-by-protocelllabs'],
+                        ['button_article_2', "rtrdgtzr - Minter's Guide ↗", 'external', "https://www.fxhash.xyz/article/rtrdgtzr-minter's-guide"],
+                        ['button_article_3', 'Generative Architecture: Questions and Answers with Artists & Curators ↗', 'external', 'https://verse.works/journal/generative-architecture-questions-and-answers-with-artists-curators'],
+                        ['button_article_4', 'Glitchverse: Interview with Jarid Scott and Luka Piškorec by Brady Evan Walker ↗', 'external', 'https://mirror.xyz/sgtslaughtermelon.eth/gvMxqRMKYd5_DwvkXfen1sbiiz6EEjsXAoTjrUBYuHY'],
+                        ['button_article_5', 'O B S C V R V M - Algorithms and Code ↗', 'external', 'https://www.fxhash.xyz/article/o-b-s-c-v-r-v-m-algorithms-and-code']],
 
-    'button_unfoldings':    [['button_unfoldings_teia', 'teia ↗', 'https://teia.art/luka'],
-                            ['button_unfoldings_objkt', 'objkt ↗', 'https://objkt.com/profile/luka/created']],
+    'button_unfoldings':    [['button_unfoldings_teia', 'teia ↗', 'external', 'https://teia.art/luka'],
+                            ['button_unfoldings_objkt', 'objkt ↗', 'external', 'https://objkt.com/profile/luka/created']],
 
-    'button_morphogens': [['button_morphogens_objkt', 'objkt ↗', 'https://objkt.com/profile/luka/created']],
+    'button_morphogens': [['button_morphogens_objkt', 'objkt ↗', 'external', 'https://objkt.com/profile/luka/created']],
 
-    'button_retroids':  [['button_retroids_nifty', 'nifty ↗', 'https://www.niftygateway.com/marketplace/collection/0x4399af3886a646226c6affcfd6c847c3d1d110cb/6']],
+    'button_retroids':  [['button_retroids_nifty', 'nifty ↗', 'external', 'https://www.niftygateway.com/marketplace/collection/0x4399af3886a646226c6affcfd6c847c3d1d110cb/6']],
 
-    'button_monocell':  [['button_monocell_source', 'source ↗', 'https://github.com/protocell-labs/monocell'],
-                        ['button_monocell_gen', 'generator ↗', 'https://protocell-labs.github.io/monocell/'],
-                        ['button_monocell_fxhash', 'fxhash ↗', 'https://www.fxhash.xyz/generative/slug/monocell'],
-                        ['button_monocell_fxfam', 'fxfam ↗', 'https://fxfam.xyz/2679']],
+    'button_monocell':  [['button_monocell_github', 'github ↗', 'external', 'https://github.com/protocell-labs/monocell'],
+                        ['button_monocell_gen', 'generator ↗', 'external', 'https://protocell-labs.github.io/monocell/'],
+                        ['button_monocell_fxhash', 'fxhash ↗', 'external', 'https://www.fxhash.xyz/generative/slug/monocell'],
+                        ['button_monocell_fxfam', 'fxfam ↗', 'external', 'https://fxfam.xyz/2679']],
     
-    'button_chromoplasm':   [['button_chromoplasm_source', 'source ↗', 'https://github.com/protocell-labs/chromoplasm'],
-                            ['button_chromoplasm_gen', 'generator ↗', 'https://protocell-labs.github.io/chromoplasm/'],
-                            ['button_chromoplasm_fxhash', 'fxhash ↗', 'https://www.fxhash.xyz/generative/slug/chromoplasm'],
-                            ['button_chromoplasm_fxfam', 'fxfam ↗', 'https://fxfam.xyz/7879']],
+    'button_chromoplasm':   [['button_chromoplasm_github', 'github ↗', 'external', 'https://github.com/protocell-labs/chromoplasm'],
+                            ['button_chromoplasm_gen', 'generator ↗', 'external', 'https://protocell-labs.github.io/chromoplasm/'],
+                            ['button_chromoplasm_fxhash', 'fxhash ↗', 'external', 'https://www.fxhash.xyz/generative/slug/chromoplasm'],
+                            ['button_chromoplasm_fxfam', 'fxfam ↗', 'external', 'https://fxfam.xyz/7879']],
     
-    'button_crystalyx': [['button_crystalyx_source', 'source ↗', 'https://github.com/protocell-labs/crystalyx'],
-                        ['button_crystalyx_gen', 'generator ↗', 'https://protocell-labs.github.io/crystalyx/'],
-                        ['button_crystalyx_fxhash', 'fxhash ↗', 'https://www.fxhash.xyz/generative/slug/crystalyx'],
-                        ['button_crystalyx_fxfam', 'fxfam ↗', 'https://fxfam.xyz/10555']],
+    'button_crystalyx': [['button_crystalyx_github', 'github ↗', 'external', 'https://github.com/protocell-labs/crystalyx'],
+                        ['button_crystalyx_gen', 'generator ↗', 'external', 'https://protocell-labs.github.io/crystalyx/'],
+                        ['button_crystalyx_fxhash', 'fxhash ↗', 'external', 'https://www.fxhash.xyz/generative/slug/crystalyx'],
+                        ['button_crystalyx_fxfam', 'fxfam ↗', 'external', 'https://fxfam.xyz/10555']],
     
-    'button_obscvrvm':  [['button_obscvrvm_source', 'source ↗', 'https://github.com/protocell-labs/obscvrvm'],
-                        ['button_obscvrvm_gen', 'generator ↗', 'https://protocell-labs.github.io/obscvrvm/'],
-                        ['button_obscvrvm_fxhash', 'fxhash ↗', 'https://www.fxhash.xyz/generative/slug/o-b-s-c-v-r-v-m'],
-                        ['button_obscvrvm_fxfam', 'fxfam ↗', 'https://fxfam.xyz/22182'],
-                        ['button_obscvrvm_tender', 'tender ↗', 'https://tender.art/project/o-b-s-c-v-r-v-m'],
-                        ['button_obscvrvm_prints', 'prints ↗', 'https://www.fxhash.xyz/article/o-b-s-c-v-r-v-m-fine-art-prints']],
+    'button_obscvrvm':  [['button_obscvrvm_github', 'github ↗', 'external', 'https://github.com/protocell-labs/obscvrvm'],
+                        ['button_obscvrvm_gen', 'generator ↗', 'external', 'https://protocell-labs.github.io/obscvrvm/'],
+                        ['button_obscvrvm_fxhash', 'fxhash ↗', 'external', 'https://www.fxhash.xyz/generative/slug/o-b-s-c-v-r-v-m'],
+                        ['button_obscvrvm_fxfam', 'fxfam ↗', 'external', 'https://fxfam.xyz/22182'],
+                        ['button_obscvrvm_tender', 'tender ↗', 'external', 'https://tender.art/project/o-b-s-c-v-r-v-m'],
+                        ['button_obscvrvm_prints', 'prints ↗', 'external', 'https://www.fxhash.xyz/article/o-b-s-c-v-r-v-m-fine-art-prints']],
     
-    'button_gltchvrs':  [['button_gltchvrs_source', 'source ↗', 'https://github.com/protocell-labs/gltchvrs'],
-                        ['button_gltchvrs_objkt', 'objkt ↗', 'https://objkt.com/collections/glitchforge']],
+    'button_gltchvrs':  [['button_gltchvrs_github', 'github ↗', 'external', 'https://github.com/protocell-labs/gltchvrs'],
+                        ['button_gltchvrs_objkt', 'objkt ↗', 'external', 'https://objkt.com/collections/glitchforge']],
     
-    'button_structura': [['button_structura_source', 'source ↗', 'https://github.com/protocell-labs/structura'],
-                        ['button_structura_gen', 'generator ↗', 'https://protocell-labs.github.io/structura/'],
-                        ['button_tectonica_verse', 'verse ↗', 'https://verse.works/artworks/f1059227-34f7-4887-af29-6f8c79632b16']],
+    'button_structura': [['button_structura_github', 'github ↗', 'external', 'https://github.com/protocell-labs/structura'],
+                        ['button_structura_gen', 'generator ↗', 'external', 'https://protocell-labs.github.io/structura/'],
+                        ['button_tectonica_verse', 'verse ↗', 'external', 'https://verse.works/artworks/f1059227-34f7-4887-af29-6f8c79632b16']],
     
-    'button_rtrdgtzr':  [['button_rtrdgtzr_source', 'source ↗', 'https://github.com/protocell-labs/rtrdgtzr'],
-                        ['button_rtrdgtzr_fxhash', 'fxhash ↗', 'https://www.fxhash.xyz/generative/slug/rtrdgtzr'],
-                        ['button_rtrdgtzr_fxfam', 'fxfam ↗', 'https://fxfam.xyz/28552']],
+    'button_rtrdgtzr':  [['button_rtrdgtzr_github', 'github ↗', 'external', 'https://github.com/protocell-labs/rtrdgtzr'],
+                        ['button_rtrdgtzr_fxhash', 'fxhash ↗', 'external', 'https://www.fxhash.xyz/generative/slug/rtrdgtzr'],
+                        ['button_rtrdgtzr_fxfam', 'fxfam ↗', 'external', 'https://fxfam.xyz/28552']],
     
-    'button_tectonica': [['button_tectonica_source', 'source ↗', 'https://github.com/protocell-labs/tectonica'],
-                        ['button_tectonica_gen', 'generator ↗', 'https://protocell-labs.github.io/tectonica/'],
-                        ['button_tectonica_fxhash', 'fxhash ↗', 'https://www.fxhash.xyz/generative/slug/t-e-c-t-o-n-i-c-a'],
-                        ['button_tectonica_fxfam', 'fxfam ↗', 'https://fxfam.xyz/30286'],
-                        ['button_tectonica_prints', 'prints ↗', 'https://www.fxhash.xyz/generative/30286/redeem']]
+    'button_tectonica': [['button_tectonica_github', 'github ↗', 'external', 'https://github.com/protocell-labs/tectonica'],
+                        ['button_tectonica_gen', 'generator ↗', 'external', 'https://protocell-labs.github.io/tectonica/'],
+                        ['button_tectonica_fxhash', 'fxhash ↗', 'external', 'https://www.fxhash.xyz/generative/slug/t-e-c-t-o-n-i-c-a'],
+                        ['button_tectonica_fxfam', 'fxfam ↗', 'external', 'https://fxfam.xyz/30286'],
+                        ['button_tectonica_prints', 'prints ↗', 'external', 'https://www.fxhash.xyz/generative/30286/redeem']]
 
 }
 
@@ -115,12 +126,12 @@ let button_to_ascii = {
     // luka + kane
     //'button_about': '          ░░▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓██████████████████████████████████████████████████████████████▓██████          ░░▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓█▓████████████████████████████████████████████████████████████████          ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓█▓███████████▓█████████████████████████████████████████████████          ░░░▒░▒▒░░░░░░░░░░▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓▓▓▓▓█▓▓▓▓██▓▓▓▓▓▓▓▓█████████████████████▓▓█▓█          ░░░░░░░░░░░         ░░░░░░▒▒▒▓▓▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒░▒▒░░░▒▒▒▒▒▒▒▓▓███████████████████▓▓▓▓█           ░░░░  ░                  ░░▒▒▒▒▒▒▒▓▓▓▓▓▓▓▒▒▒▒▒▒▒░░░░░░░░░░▒▒▒░░░░▒▒▒▓████████████▓▒░░░▓██             ░       ░░░░░░░░░░    ░░ ░░░░▒▒▒▒▒▓▓▓█▓▓▓▓▒▒░ ░░▒░░░░▒▒▒▓▓██████▒░░░   ░░░▓░░     ░▓▓▓█                ░░░░░░░▒▒▒▒▒▒▒▒▒░░░░░ ▒░░░░░░▒▒▒▓▓▓▓▓▓▒ ░▒▒▒▒▒▒▒▒▓▓▓▓▓▓████████▒░░  ░█▓░░░░▒▒▒▓▓████        ░░░░  ░░░░░░░░░░░░░░░░░░░░░░ ░           ░░░  ░▒▒▒▒░░░░░░░░░░░▒▒▓█▓██████░░ ░░▓█████████████       ░     ░▒▒▒▒▒░▒░░░░   ░     ░░   ░      ░░░░░   ▓▓▒▒▒░░▒▒▒   ░░▓█▒░▒▒▓█████▓░░▒███████████████          ░  ▒▒▒▒▒▒▒░░░ ░░░░▒░ ░ ░░░░   ░  ░▒▒▒▓▓██▒ ▒█▓▓▒░░▒▒▒▒▒▒▓▓▒▓█████▓██████░▒████████████████          ░░░▒▒▒▒▒▒▒░░░░░▒▒▒▒▒▒▒▒▒▒░░░░░░░ ░░▒▒▓▓▓▓░ ▓████▓▒▒▒▒▒▓▓▓▓▓█████████████░▓████████████████         ░░▒░▒▒▒▒▒▒▓▒▒░▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░ ░▒▓▓▓██▒  ▒████▓▒▓▒▒▓▓▓▓▓▓▓████████████░█████████████████         ░▒▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░▒░░░ ░▒▓█████▒░░█████▓▓▓▓▓▓▓▓▓██████████████▒█████████████████         ░▒▒▒░▒▒▒▒▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░ ░▒▓██████▒ ▒██████████████████████████▒██████████████████         ░▒▒▒░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▓▒▒▒░░░ ░▒▓████████▒░▒████████████████████████▒▓██████████████████         ░▒▒▒▒▒░▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒░░░▒▒▓██████████▓░▓██████████████████████▒████████████████████         ░▒▒▒▒▒▒░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒ ░▒▒▓▓████████████▒░███████████████████▒▒█████████████████████          ░▒▒▒▒▒▒▒░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░░░▒▒▓▓███████████████▒▒█████████████▒░▓███████████████████████          ░▒▒▒▒▒▒▒▓▓▒▒░▒▒▒▒▒▒▒▒▒░░░░▒░░▒▒▒▓▓██████████████████▓▒▒▒▒▒▒▒▒▓▓███████████████████████████           ░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒░▒▒▒▒▒▓▓▓██████████████████████████████████████████████████████░           ░▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░▒▒▒▒▒▒▓▓▓██████████████████▓▓▓████████████████████████████████▒░                                                                                                             ░░▒▓▓████████████████████████████████████████████████████▓▓▓▓▓▒▒▒▒░░░░░░░░░░░                       ░▒▒▓██████████████████████████████████████████████████████▓▓▓▒▒▒▒▒░░░░░░░░░░░░             ░        ░▒▓███████████████████████████████████████████████████████▓▓▓▒▒▒▒▒▒▒░░░░░░░░░░            ░░        ░▒███████████████████████████████████████████████████████▓▓▒▒▒▒▒░░░░░░░░░░░░░░░            ░░       ░▓████████████████████████████████████████████████████▓▓▒▒░░░░░ ░ ░░░░░░░░░░░▒░            ░        ▒▓███████████████████████████████████████████████████▓▒▒░░         ░░ ░░░░░░░▒▒░           ░       ░▒▓████████▓▓▓▓▓▒▒▓▓██▓▓████████████████████████████▓▓▒▒░░░░▒▒▒▒▒▒▒░░░░░ ░ ░░░░░▒▒░         ░       ░▒▓█████▓▒▒▒▒▒▒░░▒▒▓▓▒▓▓████████████████████████████▓▓▓█████████▓▓▓▓▓▒▒▒▒░░░░░░░░▒▒░        ░░      ░▓▓███▒▒▒▒▓█████████████████████████████████████████████▓▓▓▓▓▒▒▒▒░▒▒▒▒▒▒▒▒▒░░░░░░░▒░                ░▓▓██▓▒▓▓████████████████████████████████████████▓▓▓▓▓▓▒▒▓▓▓▓▓▒▒░░░░ ░░▒▒▒▒▒░░░░░░░░░       ░       ▒▓▓██▓▓███████████▓▓▓▓▒▒▒░▒██████████████████▓▒▒░░░░░░▒▓▓██▓▒▒▒▒▒▒▒░░  ░▒▒▒▒▒░░░░░░░░       ░░      ▒▓████████████▓▓▓███████▓▒▒▒░░▒█████████████▓▒░░░░ ░░▒▒▓▓▒ ░     ▒░ ░░░ ░▒▒▒▒▒░░░░░░░░      ▒░      ▒▓███████████▓██▓▒▒ ░    ░▒██▓▓▒███████████▓▒░░   ░░▒░░▓██ ▒▒   ▒▓░       ░░░░░░░░░░░░      ▓█▒     ▒▓███████████▓░░▓██░░▓░ ░▒▓▒░░▒▓▓▓█████████▓▒░░░  ░░░░░▒▒▒▓▒░░░▒▒░░░░░░░░░░░░░░░░░░░░░      ▒██▒    ▒▓█████████▓▒▒▒▒▓▓█▓▓▓▓▓▓▓▒▒▒▒▓█████████████▒░░░░░░░░▒▒▒▒▒▓██▓▓▓▓▓▓▒▒▒░░░░░░░░░░░░░░░░░     ░▓█▓░  ░▓███████████████████████████████████████████▒░░░░░░░░░░░▒▒▓▓███████▓▒▒░▒░░░░░░░░░░░░░░░░    ░▒▓▓▒  ░▓███████████████████████████████████████████▒░░░░░░░▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░    ░▒▒▒▒  ░▓██████████████████████████████████████████▓▒░░░░░░░▒▒▒▒▒▒▒▒▒░░░░░░▒▒▒▒▒▒▒▒▒▒▒░░░░░▒▒░░░     ░▒▒▓░ ░▓██████████████████████████████████████████▓▓▒░░░░░░░▒▒▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░▒▒▒░░░    ░▒▓█░ ░▓██████████████████████████████████████████▓▓▒▒░░░░░░▒▒▓▓██▓▓▓▓▓▓▒▓▓▓▓▓▒▒▒▒▒▒▒▒░░░░▒▒▒░░░     ░██▓░░▓███████████████████████████████████████████▓▓▒▒░░  ░░▒▓█████████▓▓▓▓▓▓▓▒▒▒▒▒▒░░░░▒▒▒▒░░░  ░ ░░▓█▓░░▓███████████████████████████████████████████▓▒▒▒░░░░░ ░▒██████████▓▓▓▓▓▓▒▒▒▒▒▒░░░░▒▒▒▒░▒▒░ ░',
     
-    'placeholder': '---------------------------------------------------------------------------------------------------',// 99 characters
+    'placeholder': '',
     
     // just luka
     'button_about': '          ░░▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓██████████████████████████████████████████████████████████████▓██████          ░░▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓█▓████████████████████████████████████████████████████████████████          ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓█▓███████████▓█████████████████████████████████████████████████          ░░░▒░▒▒░░░░░░░░░░▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓▓▓▓▓█▓▓▓▓██▓▓▓▓▓▓▓▓█████████████████████▓▓█▓█          ░░░░░░░░░░░         ░░░░░░▒▒▒▓▓▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒░▒▒░░░▒▒▒▒▒▒▒▓▓███████████████████▓▓▓▓█           ░░░░  ░                  ░░▒▒▒▒▒▒▒▓▓▓▓▓▓▓▒▒▒▒▒▒▒░░░░░░░░░░▒▒▒░░░░▒▒▒▓████████████▓▒░░░▓██             ░       ░░░░░░░░░░    ░░ ░░░░▒▒▒▒▒▓▓▓█▓▓▓▓▒▒░ ░░▒░░░░▒▒▒▓▓██████▒░░░   ░░░▓░░     ░▓▓▓█                ░░░░░░░▒▒▒▒▒▒▒▒▒░░░░░ ▒░░░░░░▒▒▒▓▓▓▓▓▓▒ ░▒▒▒▒▒▒▒▒▓▓▓▓▓▓████████▒░░  ░█▓░░░░▒▒▒▓▓████        ░░░░  ░░░░░░░░░░░░░░░░░░░░░░ ░           ░░░  ░▒▒▒▒░░░░░░░░░░░▒▒▓█▓██████░░ ░░▓█████████████       ░     ░▒▒▒▒▒░▒░░░░   ░     ░░   ░      ░░░░░   ▓▓▒▒▒░░▒▒▒   ░░▓█▒░▒▒▓█████▓░░▒███████████████          ░  ▒▒▒▒▒▒▒░░░ ░░░░▒░ ░ ░░░░   ░  ░▒▒▒▓▓██▒ ▒█▓▓▒░░▒▒▒▒▒▒▓▓▒▓█████▓██████░▒████████████████          ░░░▒▒▒▒▒▒▒░░░░░▒▒▒▒▒▒▒▒▒▒░░░░░░░ ░░▒▒▓▓▓▓░ ▓████▓▒▒▒▒▒▓▓▓▓▓█████████████░▓████████████████         ░░▒░▒▒▒▒▒▒▓▒▒░▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░ ░▒▓▓▓██▒  ▒████▓▒▓▒▒▓▓▓▓▓▓▓████████████░█████████████████         ░▒▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░▒░░░ ░▒▓█████▒░░█████▓▓▓▓▓▓▓▓▓██████████████▒█████████████████         ░▒▒▒░▒▒▒▒▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░ ░▒▓██████▒ ▒██████████████████████████▒██████████████████         ░▒▒▒░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▓▒▒▒░░░ ░▒▓████████▒░▒████████████████████████▒▓██████████████████         ░▒▒▒▒▒░▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒░░░▒▒▓██████████▓░▓██████████████████████▒████████████████████         ░▒▒▒▒▒▒░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒ ░▒▒▓▓████████████▒░███████████████████▒▒█████████████████████          ░▒▒▒▒▒▒▒░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░░░▒▒▓▓███████████████▒▒█████████████▒░▓███████████████████████          ░▒▒▒▒▒▒▒▓▓▒▒░▒▒▒▒▒▒▒▒▒░░░░▒░░▒▒▒▓▓██████████████████▓▒▒▒▒▒▒▒▒▓▓███████████████████████████           ░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒░▒▒▒▒▒▓▓▓██████████████████████████████████████████████████████░           ░▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░▒▒▒▒▒▒▓▓▓██████████████████▓▓▓████████████████████████████████▒░',
     
-    'button_code': '---------------------------------------------------------------------------------------------------',
+    'button_videos': '',
     
     'button_articles': '',
 
@@ -149,26 +160,51 @@ let button_to_ascii = {
 
 
 let button_to_preformat = {
-    'button_code': "<pre>// compress signal so it can be stored as a string param\nfunction compressSignal(signal, repeatingBufferChars, repeatingAlphaChars) {\n\tlet compressed_signal = signal;\n\tlet filter;\n\n\t// for every number of repeating buffer characters, create a regex to replace them with a single character from repeatingBufferChars list\n\t// we iterate from the larger number of repetitions to the smaller number, because... well, think about it\n\tfor (let num = 9; num > 1; num--) {\n\t\t// constructing regex of the form /黑{num}/g - global replacement (every occurrence)\n\t\tfilter = new RegExp(bufferChar + '{' + num + '}', 'g');\n\t\t// replace the repeating buffer characters with a single character from repeatingBufferChars list\n\t\tcompressed_signal = compressed_signal.replace(filter, repeatingBufferChars[num - 1]);\n\t}\n\n\t// find number of occurances of alphaChar in the signal\n\t// this will be the maximum number of alpha characters that can be compressed\n\tfilter = new RegExp(alphaChar, 'g');\n\tlet alpha_occurrences = (compressed_signal.match(filter) || []).length;\n\n\t// for every number of repeating alpha characters, create a regex to replace them with a single character from repeatingAlphaChars list\n\t// we iterate from the larger number of repetitions to the smaller number, same as above\n\tfor (let num = alpha_occurrences; num > 1; num--) {\n\t\t// constructing regex of the form /门{num}/g - global replacement (every occurrence)\n\t\tfilter = new RegExp(alphaChar + '{' + num + '}', 'g');\n\t\t// replace the repeating alpha characters with a single character from repeatingAlphaChars list\n\t\tcompressed_signal = compressed_signal.replace(filter, repeatingAlphaChars[num - 1]);\n\t}\n\n\treturn compressed_signal;\n}</pre>", 
+    'button_github': "<pre>// compress signal so it can be stored as a string param\nfunction compressSignal(signal, repeatingBufferChars, repeatingAlphaChars) {\n\tlet compressed_signal = signal;\n\tlet filter;\n\n\t// for every number of repeating buffer characters, create a regex to replace them with a single character from repeatingBufferChars list\n\t// we iterate from the larger number of repetitions to the smaller number, because... well, think about it\n\tfor (let num = 9; num > 1; num--) {\n\t\t// constructing regex of the form /黑{num}/g - global replacement (every occurrence)\n\t\tfilter = new RegExp(bufferChar + '{' + num + '}', 'g');\n\t\t// replace the repeating buffer characters with a single character from repeatingBufferChars list\n\t\tcompressed_signal = compressed_signal.replace(filter, repeatingBufferChars[num - 1]);\n\t}\n\n\t// find number of occurances of alphaChar in the signal\n\t// this will be the maximum number of alpha characters that can be compressed\n\tfilter = new RegExp(alphaChar, 'g');\n\tlet alpha_occurrences = (compressed_signal.match(filter) || []).length;\n\n\t// for every number of repeating alpha characters, create a regex to replace them with a single character from repeatingAlphaChars list\n\t// we iterate from the larger number of repetitions to the smaller number, same as above\n\tfor (let num = alpha_occurrences; num > 1; num--) {\n\t\t// constructing regex of the form /门{num}/g - global replacement (every occurrence)\n\t\tfilter = new RegExp(alphaChar + '{' + num + '}', 'g');\n\t\t// replace the repeating alpha characters with a single character from repeatingAlphaChars list\n\t\tcompressed_signal = compressed_signal.replace(filter, repeatingAlphaChars[num - 1]);\n\t}\n\n\treturn compressed_signal;\n}</pre>", 
 }
 
 
 let button_to_iframe = {
     'placeholder': '',
-    'button_about': '<img src="assets/gibson_neuromancer_landscape_signal_parsing_02.gif" width="100%" height="auto" id="iframe_retroids">',
-    'button_code':  '<img src="assets/gibson_neuromancer_landscape_signal_parsing_02.gif" width="100%" height="auto" id="iframe_code">',
-    'button_articles': '<img src="assets/stochastic_color_grading_5824492.gif" width="100%" height="auto" id="iframe_articles">',
+    'button_about': '<img src="assets/gibson_neuromancer_landscape_signal_parsing_02.gif" width="100%" height="auto" id="gif_about">',
+    'button_videos':  '<img src="assets/gltchvrs_unminted_058.gif" width="100%" height="auto" id="gif_videos">',
+    'button_articles': '<img src="assets/stochastic_color_grading_5824492.gif" width="100%" height="auto" id="gif_articles">',
 
     'button_tectonica': '<iframe src="https://protocell-labs.github.io/tectonica/" width="100%" height="100%" frameBorder="0" scrolling="no" id="iframe_tectonica"></iframe>',
-    'button_rtrdgtzr': '<img src="assets/rtrdgtzr_186.gif" width="100%" height="auto" id="iframe_rtrdgtzr">',
+    'button_rtrdgtzr': '<img src="assets/rtrdgtzr_186.gif" width="100%" height="auto" id="gif_rtrdgtzr">',
     'button_structura': '<iframe src="https://protocell-labs.github.io/structura/" width="100%" height="100%" frameBorder="0" scrolling="no" id="iframe_structura"></iframe>',
-    'button_gltchvrs': '<img src="assets/gltchvrs_53.gif" width="100%" height="auto" id="iframe_gltchvrs">',
+    'button_gltchvrs': '<img src="assets/gltchvrs_53.gif" width="100%" height="auto" id="gif_gltchvrs">',
     'button_obscvrvm': '<iframe src="https://protocell-labs.github.io/obscvrvm/" width="100%" height="100%" frameBorder="0" scrolling="no" id="iframe_obscvrvm"></iframe>',
     'button_crystalyx': '<iframe src="https://protocell-labs.github.io/crystalyx/" width="100%" height="100%" frameBorder="0" scrolling="no" id="iframe_crystalyx"></iframe>',
     'button_chromoplasm': '<iframe src="https://protocell-labs.github.io/chromoplasm/" width="100%" height="100%" frameBorder="0" scrolling="no" id="iframe_chromoplasm"></iframe>',
     'button_monocell': '<iframe src="https://protocell-labs.github.io/monocell/" width="100%" height="100%" frameBorder="0" scrolling="no" id="iframe_monocell"></iframe>',
-    'button_retroids': '<img src="assets/protocell_labs-retroid_1.gif" width="100%" height="auto" id="iframe_retroids">',
+    'button_retroids': '<img src="assets/protocell_labs-retroid_1.gif" width="100%" height="auto" id="gif_retroids">',
 
-    'button_morphogens': '<video autoplay muted loop src="assets/morphogen_001_smaller.mp4" width="100%" height="auto" id="iframe_unfoldings">',
-    'button_unfoldings': '<video autoplay muted loop src="assets/grid_strong_transform_5x5x5_dark_medium_bitrate.mp4" width="100%" height="auto" id="iframe_unfoldings">',
+    'button_morphogens': '<video autoplay muted loop src="assets/morphogen_001_smaller.mp4" width="100%" height="auto" id="video_unfoldings">',
+    'button_unfoldings': '<video autoplay muted loop src="assets/grid_strong_transform_5x5x5_dark_medium_bitrate.mp4" width="100%" height="auto" id="video_unfoldings">',
 }
+
+
+// [type, status, editions, released, chain, storage, platform]
+let button_to_data = {
+    'placeholder':          ['/', '/', '/', '/', '/', '/', '/'],
+    'button_about':         ['/', '/', '/', '/', '/', '/', '/'],
+    'button_videos':        ['/', '/', '/', '/', '/', '/', '/'],
+    'button_articles':      ['/', '/', '/', '/', '/', '/', '/'],
+
+    'button_tectonica':     ['long-form', 'minted out', '200', 'February 11, 2024', 'Tezos', 'IPFS', 'fxhash.xyz'],
+    'button_rtrdgtzr':      ['long-form', 'minted out', '257', 'August 18, 2023', 'Tezos', 'IPFS + on-chain', 'fxhash.xyz'],
+    'button_structura':     ['long-form', 'minted out', '87', 'June 21, 2023', 'Ethereum (L1)', 'IPFS', 'verse.works'],
+    'button_gltchvrs':      ['long-form', 'minted out', '64', 'January 2023', 'Tezos', 'IPFS', 'glitchforge.xyz (defunct)'],
+    'button_obscvrvm':      ['long-form', 'minted out', '500', 'December 6, 2022', 'Tezos', 'IPFS', 'fxhash.xyz'],
+    'button_crystalyx':     ['long-form', 'minted out', '250', 'March 11, 2022', 'Tezos', 'IPFS', 'fxhash.xyz'],
+    'button_chromoplasm':   ['long-form', 'minted out', '250', 'January 25, 2022', 'Tezos', 'IPFS', 'fxhash.xyz'],
+    'button_monocell':      ['long-form', 'minted out', '250', 'December 8, 2021', 'Tezos', 'IPFS', 'fxhash.xyz'],
+    
+    'button_retroids':      ['multi-edition', 'minted out', '4', 'May 2023', 'Ethereum (L1)', 'IPFS', 'niftygateway.com'],
+    'button_morphogens':    ['short-form', 'minted out', 'varied', 'January - September 2022', 'Tezos', 'IPFS', 'versum.xyz (defunct)'],
+    'button_unfoldings':    ['short-form', 'minted out', 'varied', 'July 2021 - October 2022', 'Tezos', 'IPFS', 'teia.art'],
+}
+
+
+//'status:&nbsp;&nbsp; minted out<br>editions: 200<br>released: December 8, 2021<br>chain:&nbsp;&nbsp;&nbsp; Tezos<br>storage:&nbsp; IPFS<br>platform: fxhash<br>&bsol;> '
