@@ -83,7 +83,7 @@ let selected_sub_button = ''; // save the id of the clicked sub-button
 let selected_sub_button_label = ''; // save the label of the clicked sub-button
 let button_arrange_vec, sub_button_arrange_vec, sub_button_arrange_vec_copy; // these vector will help us arrange buttons in a free-form line
 let button_offset = 4.0; // approximate value the buttons will be offset from each other, 40.0
-let sub_button_offset = 300.0; // horizontal shift of sub-buttons
+let sub_button_offset_max = 300.0; // maximal horizontal shift of sub-buttons, otherwise 25% of windowWidth
 let selected_button_sequence = 0; // storing the sequence (relative position) of the selected button
 
 let button_y_start; // vertical height of the first button - defined inside createTopLevelButtons()

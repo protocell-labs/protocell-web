@@ -403,6 +403,7 @@ function createTopLevelButtons() {
 function createProjectButtons() {
     // position of the first button in the free-form line
     button_arrange_vec = createVector(windowWidth / 16, random(windowHeight / 4, windowHeight / 2)); 
+    let sub_button_offset = min(sub_button_offset_max, windowWidth / 4);
     sub_button_arrange_vec = button_arrange_vec.copy().add( createVector(sub_button_offset, button_offset / 2) ); // copied vector but shifted to the right and down
 
     // spawn main project buttons
@@ -499,6 +500,7 @@ function showMainWebsite() {
     bar_p1.show();
     bar_p2.show();
     bar_i1.show();
+
     bar_p1.html('&nbsp;' + selected_button_label);
     bar_p2.html('&nbsp;data');
     bar_i1.html('&nbsp;CCSID 437');
@@ -600,6 +602,7 @@ function setStartState() {
     } 
 
     // reset position vector, shifted to the right and down from the button
+    let sub_button_offset = min(sub_button_offset_max, windowWidth / 4);
     sub_button_arrange_vec_copy = button_positions[0].copy().add( createVector(sub_button_offset, button_offset / 2) );
 
     // reset sub-button positions
@@ -640,6 +643,7 @@ function setStartState() {
 
     // show button label on the bar
     bar_p1.html('&nbsp;' + selected_button_label);
+    bar_p2.html('&nbsp;contact');
     bar_i1.html('&nbsp;CCSID 437');
     
 }
@@ -670,6 +674,7 @@ function buttonClicked() {
     buttons.forEach(function (item, index) { if (item.elt.id == clicked_button_id) { selected_button_sequence = index}; });
 
     // reset position vector, shifted to the right and down from the button
+    let sub_button_offset = min(sub_button_offset_max, windowWidth / 4);
     sub_button_arrange_vec_copy = button_positions[selected_button_sequence].copy().add( createVector(sub_button_offset, button_offset / 2) );
 
     // reset sub-button positions
@@ -697,8 +702,10 @@ function buttonClicked() {
 
     if (selected_button == 'button_about') { // this entry has a simple string format
         text_p2_input = button_to_data[this.elt.id]; 
+        bar_p2.html('&nbsp;contact');
     } else { // button_to_data is of the form [type, status, editions, released, chain, storage, platform]
         text_p2_input = 'type:&nbsp;&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][0] + '<br>status:&nbsp;&nbsp; ' + button_to_data[this.elt.id][1] + '<br>editions: ' + button_to_data[this.elt.id][2] + '<br>released: ' + button_to_data[this.elt.id][3] + '<br>chain:&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][4] + '<br>storage:&nbsp; ' + button_to_data[this.elt.id][5] + '<br>platform: ' + button_to_data[this.elt.id][6] + '<br>&bsol;> ';
+        bar_p2.html('&nbsp;data');
     }
 
     // load terminal i1 image (ascii or media)
@@ -851,3 +858,16 @@ function applySubButtonStyle(button, button_id) {
 
     button.mouseClicked(buttonSubClicked);
 }
+
+
+
+// triggers when browser's size changes
+function windowResized() {
+    // resize canvas
+    resizeCanvas(windowWidth, windowHeight); 
+
+    // reposition terminals to fixed default locations
+    //bar_p1.position(windowWidth / 2, windowHeight / 16);
+    //bar_p2.position(3 * windowWidth / 8, 2 * windowHeight / 3);
+    //bar_i1.position(windowWidth / 4, windowHeight / 4);
+  }
