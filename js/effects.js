@@ -99,7 +99,7 @@ function createTerminalI1() {
 
     // terminal - position will be relative to the bar above - calculateDraggableBarOffset() function
 
-    terminal_i1 = createP(ascii_image);
+    terminal_i1 = createP();
     terminal_i1.id('terminal_i1');
 
     terminal_i1.style('color', secondary_color);
@@ -120,7 +120,7 @@ function createTerminalI1() {
     terminal_i1.hide(); // hide at the beginning
 
     text_i1_idx = 0; // set counting index to zero
-    ascii_image = formatASCII(button_to_ascii['placeholder']);
+    ascii_image = formatASCII(button_to_ascii['placeholder'][1]);
 
     text_i1_input = ascii_image + '<br>&bsol;> ';
 
@@ -149,7 +149,6 @@ function createTerminalI2() {
     terminal_i2.style('position', 'absolute');
     terminal_i2.style('z-index', '0');
 
-    //terminal_i2.html(button_to_iframe['placeholder']); // insert iframe html tag
     terminal_i2.hide(); // hide at the beginning
 }
 
@@ -162,7 +161,7 @@ function createTerminalP1() {
 
     bar_p1 = createDiv();
     bar_p1.id('bar_p1');
-    bar_p1.position(windowWidth / 2, random(windowHeight / 8, windowHeight / 2));
+    bar_p1.position(windowWidth / 2, random(windowHeight / 16, windowHeight / 4));
     bar_p1.style('width', '43vmin');
     bar_p1.style('height', bar_height); // bar_height
     bar_p1.style('z-index', '2');
@@ -587,8 +586,6 @@ function buttonIntroClicked() {
 
 // manually "clicks" about button at the very start
 function setStartState() {
-
-
     // change color of the clicked button to selected
     buttons[0].style('color', tertiary_color);
 
@@ -627,17 +624,16 @@ function setStartState() {
 
     // load project data
     text_p2_idx = 0;
-    // button_to_data is of the form [type, status, editions, released, chain, storage, platform]
-    text_p2_input = 'type:&nbsp;&nbsp;&nbsp;&nbsp; ' + button_to_data['button_about'][0] + '<br>status:&nbsp;&nbsp; ' + button_to_data['button_about'][1] + '<br>editions: ' + button_to_data['button_about'][2] + '<br>released: ' + button_to_data['button_about'][3] + '<br>chain:&nbsp;&nbsp;&nbsp; ' + button_to_data['button_about'][4] + '<br>storage:&nbsp; ' + button_to_data['button_about'][5] + '<br>platform: ' + button_to_data['button_about'][6] + '<br>&bsol;> ';
+    text_p2_input = button_to_data['button_about']; // this entry has a simple string format
 
     // format and load ascii image
-    ascii_image = formatASCII(button_to_ascii['button_about']);
+    ascii_image = formatASCII(button_to_ascii['button_about'][1]);
     
     text_i1_idx = 0; // set counting index to zero
     text_i1_input = ascii_image + '<br>&bsol;> ';
 
     // load iframe generator (also image or video)
-    terminal_i2.html(button_to_iframe['button_about']); // insert image/video html tag
+    terminal_i2.html(gene_weighted_choice(button_to_iframe['button_about'])); // insert image/video html tag
 
     header_idx = 0; // set counting index to zero
     footer_idx = 0; // set counting index to zero
@@ -698,28 +694,34 @@ function buttonClicked() {
 
     // load project data
     text_p2_idx = 0;
-    // button_to_data is of the form [type, status, editions, released, chain, storage, platform]
-    text_p2_input = 'type:&nbsp;&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][0] + '<br>status:&nbsp;&nbsp; ' + button_to_data[this.elt.id][1] + '<br>editions: ' + button_to_data[this.elt.id][2] + '<br>released: ' + button_to_data[this.elt.id][3] + '<br>chain:&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][4] + '<br>storage:&nbsp; ' + button_to_data[this.elt.id][5] + '<br>platform: ' + button_to_data[this.elt.id][6] + '<br>&bsol;> ';
 
-    // load ascii image
-    if (this.elt.id == 'button_code') { // here we are not loading an ascii image but a preformatted code snippet
-        ascii_image = button_to_preformat[this.elt.id];
-    } else { // format and load ascii image
-        ascii_image = formatASCII(button_to_ascii[this.elt.id]);
+    if (selected_button == 'button_about') { // this entry has a simple string format
+        text_p2_input = button_to_data[this.elt.id]; 
+    } else { // button_to_data is of the form [type, status, editions, released, chain, storage, platform]
+        text_p2_input = 'type:&nbsp;&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][0] + '<br>status:&nbsp;&nbsp; ' + button_to_data[this.elt.id][1] + '<br>editions: ' + button_to_data[this.elt.id][2] + '<br>released: ' + button_to_data[this.elt.id][3] + '<br>chain:&nbsp;&nbsp;&nbsp; ' + button_to_data[this.elt.id][4] + '<br>storage:&nbsp; ' + button_to_data[this.elt.id][5] + '<br>platform: ' + button_to_data[this.elt.id][6] + '<br>&bsol;> ';
     }
 
+    // load terminal i1 image (ascii or media)
+    if (button_to_ascii[this.elt.id][0] == 'ascii') { // format is 'ascii'
+        ascii_image = formatASCII(button_to_ascii[this.elt.id][1]);
+        text_i1_input = ascii_image + '<br>&bsol;> ';
+        bar_i1.html('&nbsp;CCSID 437');
+    } else { // format is 'media'
+        ascii_image = button_to_ascii[this.elt.id][1];
+        text_i1_input = ascii_image;
+        bar_i1.html('&nbsp;media');
+    } 
+
     text_i1_idx = 0; // set counting index to zero
-    text_i1_input = ascii_image + '<br>&bsol;> ';
 
     // load iframe generator (also image or video)
-    terminal_i2.html(button_to_iframe[this.elt.id]); // insert iframe html tag
+    terminal_i2.html(gene_weighted_choice(button_to_iframe[this.elt.id])); // insert iframe html tag
 
     header_idx = 0; // set counting index to zero
     footer_idx = 0; // set counting index to zero
 
     // show button label on the bar
     bar_p1.html('&nbsp;' + selected_button_label);
-    bar_i1.html('&nbsp;CCSID 437');
 
 }
 
@@ -741,6 +743,22 @@ function buttonSubClicked() {
     // load terminal text
     text_p1_idx = 0;
     text_p1_input = button_to_text[this.elt.id];
+
+    // load terminal i1 image (ascii or media)
+    if (button_to_ascii[this.elt.id][0] == 'ascii') { // format is 'ascii'
+        ascii_image = formatASCII(button_to_ascii[this.elt.id][1]);
+        text_i1_input = ascii_image + '<br>&bsol;> ';
+        bar_i1.html('&nbsp;CCSID 437');
+    } else { // format is 'media'
+        ascii_image = button_to_ascii[this.elt.id][1];
+        text_i1_input = ascii_image;
+        bar_i1.html('&nbsp;media');
+    } 
+
+    text_i1_idx = 0; // set counting index to zero
+
+    // show sub-button label on the bar
+    bar_p1.html('&nbsp;' + selected_sub_button_label);
     
 }
 

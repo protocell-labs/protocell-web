@@ -14,3 +14,38 @@ canvas {
     font-family: 'MonoMEK';
     src: url('MEK-Mono.otf');
 }
+
+/* unvisited link */
+a:link {
+    color: #00ff00;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+}
+
+/* visited link */
+a:visited {
+    color: #00ff00;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+}
+
+/* mouse over link */
+a:hover {
+    color: #ff00ff;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+}
+
+/* selected link */
+a:active {
+    color: #ff00ff;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+}
+
+
+
