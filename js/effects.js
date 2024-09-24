@@ -2,6 +2,27 @@
 
 
 
+// print info to console at the beginning
+function infoToConsole() {
+    console.clear(); // clear the console at the beginning
+
+    var protocell_xyz_banner =    "%c                                                                                   \n"
+                                + "%c     p r o t o c e l l . x y z  |  { p r o t o c e l l : l a b s }  |  2 0 2 4     \n"
+                                + "%c                                                                                   \n"
+                                + "%c          s o u r c e  |  https://github.com/protocell-labs/protocell-web          \n"
+                                + "%c                                                                                   \n";
+
+    console.log(protocell_xyz_banner,
+                `font-weight: bold; font-family: "Courier New", monospace;`,
+                `font-weight: bold; font-family: "Courier New", monospace;`,
+                `font-weight: bold; font-family: "Courier New", monospace;`,
+                `font-weight: bold; font-family: "Courier New", monospace;`,
+                `font-weight: bold; font-family: "Courier New", monospace;`);
+
+}
+
+
+
 // screen container
 function createScreenDiv() {
     screen_div = createDiv(); // div element encompasing the whole screen

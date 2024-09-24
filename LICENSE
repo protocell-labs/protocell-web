@@ -19,3 +19,32 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+Attribution of dependencies
+
+
+protocell-web source code (unminified and unobfuscated).
+Available from: https://github.com/protocell-labs/protocell-web
+This code is provided under MIT License.
+Copyright (c) 2024 {protocell:labs}
+
+Three.js for rendering 3D geometry.
+Downloaded from: https://github.com/mrdoob/three.js
+This code is provided under MIT License.
+Copyright (c) 2010-2024 three.js authors.
+
+p5.js for drawing to HTML5 canvas and animations.
+Downloaded from: https://github.com/processing/p5.js
+This code is provided under LGPL-2.1 license.
+Copyright (c) 2024 p5.js authors.
+
+matter.js for 2D rigid body physics.
+Downloaded from: https://github.com/liabru/matter-js
+This code is provided under MIT License.
+Copyright (c) 2024 Liam Brummitt and contributors.
+
+MonoMEK v1.1 font from Michael Alexander (MEK.txt)
+Downloaded from: https://drive.google.com/drive/folders/1S-lXxBjKl7nBsqvDm215pG6XBLbgx-vx
+This code is provided under CC0 license.
+Copyright (c) 2024 Michael Alexander (MEK.txt)

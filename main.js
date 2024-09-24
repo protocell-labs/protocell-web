@@ -134,13 +134,8 @@ function setup() {
     original_windowWidth = windowWidth; 
     original_windowHeight = windowHeight;
 
-
-    console.log(windowWidth);
-    console.log(windowHeight);
-
     // MASONRY PLAYGROUND
     createMasonryPlayground(); // creates masonry wall at the intro page
-
 
     // CREATE DOM ELEMENTS
     createScreenDiv(); // screen container
@@ -156,6 +151,9 @@ function setup() {
     createFooter(); // website source code
  
     calculateDraggableBarOffset(); // calculate offset of draggable bar elements, and use it to position terminals (which are themselves not draggable)
+
+    // PRINT TO CONSOLE
+    infoToConsole();
 
 }
 
