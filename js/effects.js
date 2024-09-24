@@ -378,7 +378,7 @@ function createFooter() {
     footer_div.style('justify-content', 'center');
     footer_div.style('align-items', 'center');
 
-    footer = createA('https://github.com/protocell-labs', 'clone website from GitHub ↗', '_blank'); // link, title, '_blank' parameter makes the link open in a new tab
+    footer = createA('https://github.com/protocell-labs/protocell-web', 'clone website from GitHub ↗', '_blank'); // link, title, '_blank' parameter makes the link open in a new tab
     footer.parent(footer_div);
     footer.id('footer');
 
