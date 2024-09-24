@@ -42,8 +42,6 @@ let bar_height = '25px'; // in pixels so we can easily calculate top / left offs
 let intro_screen = true;
 let intro_button, text_intro_button, text_intro_button_idx, intro_button_input;
 
-let stickyNote;
-
 
 // module aliases
 var Engine = Matter.Engine,
@@ -65,8 +63,12 @@ var mConstraint;
 var create_elements = false;
 var starting_nr_of_bricks;
 
+var graffiti_image, graffiti_image_path, original_windowWidth, original_windowHeight;
+var show_brick_outlines = false; // at the beginning, brick wall outlines will be hidden until the user clicks on the canvas
+
 var brick_width = 75;
 var brick_height = 25;
+var brick_gap = 1.0; // helps bring out the brick outlines
 var gradient_part_a, gradient_part_b;
 
 var rotating_force = true; // rotating force applied to the bricks after intro counter triggers
@@ -91,10 +93,30 @@ let buttons_idx_y_gap = 2; // button sequence index after which there is gap app
 let buttons_y_gap_size = 2; // size of the gap between buttons in number of places
 
 
+
+// PRELOAD
+
+function preload() {
+    // choose portrait graffiti image
+    if (0.8 * document.documentElement.clientWidth > document.documentElement.clientHeight) {
+        graffiti_image_path = gene_weighted_choice(graffiti_paths_landscape);
+    // choose landscape graffiti image
+    } else if (0.8 * document.documentElement.clientHeight > document.documentElement.clientWidth) {
+        graffiti_image_path = gene_weighted_choice(graffiti_paths_portrait);
+    // choose square graffiti image
+    } else {
+        graffiti_image_path = gene_weighted_choice(graffiti_paths_square);
+    }
+    
+    graffiti_image = loadImage(graffiti_image_path);
+
+}
+
+
+
 // SETUP
 
 function setup() {
-
     // ORDER of elements
     // intro button - z-index 4
     // buttons + sub-buttons - z-index 4
@@ -103,12 +125,18 @@ function setup() {
     // ascii image terminal i1 - z-index 1
     // iframe + image terminal i2 - z-index 0
 
-
     // CANVAS - canvas will take the full width of the window so we can draw on it
     canvas = createCanvas(windowWidth, windowHeight);
     canvas.style('position', 'absolute');
     canvas.style('z-index', '3');
 
+    // for scaling graffiti - windowWidth and windowHeight can change when the window is resized so we want to save the original value
+    original_windowWidth = windowWidth; 
+    original_windowHeight = windowHeight;
+
+
+    console.log(windowWidth);
+    console.log(windowHeight);
 
     // MASONRY PLAYGROUND
     createMasonryPlayground(); // creates masonry wall at the intro page
@@ -128,6 +156,7 @@ function setup() {
     createFooter(); // website source code
  
     calculateDraggableBarOffset(); // calculate offset of draggable bar elements, and use it to position terminals (which are themselves not draggable)
+
 }
 
 

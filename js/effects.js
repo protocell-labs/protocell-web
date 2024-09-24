@@ -871,3 +871,11 @@ function windowResized() {
     //bar_p2.position(3 * windowWidth / 8, 2 * windowHeight / 3);
     //bar_i1.position(windowWidth / 4, windowHeight / 4);
   }
+
+
+
+// triggers when mouse is pressed
+function mousePressed() {
+    show_brick_outlines = true; // at the beginning, brick wall outlines will be hidden until the user clicks on the canvas
+}
+  
