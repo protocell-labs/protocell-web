@@ -70,7 +70,8 @@ let button_spawn = {
     'button_videos':    [['button_all_is_motion', 'All Is Motion - 2021-2024 project reel', 'internal', ''],
                         ['button_tectonica_logs', 'T E C T O N I C A logs - collection trailer', 'internal', ''],
                         ['button_second_law', 'Second Law - short movie', 'internal', ''],
-                        ['button_genart_lecture', 'Gen Art and Digital Assets - lecture ↗', 'external', 'https://youtu.be/pIXZrX3NShE?si=aeLh-ldpwaX_ykNI']],
+                        ['button_genart_lecture', 'Gen Art and Digital Assets - lecture ↗', 'external', 'https://youtu.be/pIXZrX3NShE?si=aeLh-ldpwaX_ykNI'],
+                        ['button_eth_lecture', 'Computational Production Paradigms and Design Augmentation - lecture ↗', 'external', 'https://www.youtube.com/watch?v=RrajGDdAr_Y']],
     
     'button_articles':  [['button_article_1', 'T E C T O N I C A - article by The Culture Project ↗', 'external', 'https://thecultureproject.substack.com/p/tectonica-by-protocelllabs'],
                         ['button_article_2', "rtrdgtzr - Minter's Guide ↗", 'external', "https://www.fxhash.xyz/article/rtrdgtzr-minter's-guide"],
